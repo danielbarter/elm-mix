@@ -1,34 +1,47 @@
 module Mix exposing (..)
 
+import Dict
+
 import Atom exposing ( Sign(..)
                      , baseExpand
                      , baseContract
                      , Byte
                      , byte
                      , value
+                     , mixBase
                      )
 
-type alias RegisterA = ( Sign
-                       , Byte
-                       , Byte
-                       , Byte
-                       , Byte
-                       , Byte
-                       )
 
-type alias RegisterX = ( Sign
-                       , Byte
-                       , Byte
-                       , Byte
-                       , Byte
-                       , Byte
-                       )
+type alias SmallRegister = ( Sign, Byte, Byte )
 
-type alias RegisterI1 = ( Sign,Byte,Byte)
-type alias RegisterI2 = ( Sign,Byte,Byte)
-type alias RegisterI3 = ( Sign,Byte,Byte)
-type alias RegisterI4 = ( Sign,Byte,Byte)
-type alias RegisterI5 = ( Sign,Byte,Byte)
-type alias RegisterI6 = ( Sign,Byte,Byte)
+type alias BigRegister = ( Sign
+                         , Byte
+                         , Byte
+                         , Byte
+                         , Byte
+                         , Byte
+                         )
 
-type alias RegisterIJ = ( Sign,Byte,Byte)
+type alias Memory = Dict.Dict Int BigRegister
+
+type OverflowToggle = Overflow | Good
+type ComparisonIndicator = L | E | G | None
+
+type alias Mix = { a   : BigRegister
+                 , x   : BigRegister
+                 , i1  : SmallRegister
+                 , i2  : SmallRegister
+                 , i3  : SmallRegister
+                 , i4  : SmallRegister
+                 , i5  : SmallRegister
+                 , i6  : SmallRegister
+                 , j   : SmallRegister
+                 , mem : Memory
+                 , overflow : OverflowToggle
+                 , comparision : ComparisonIndicator
+                 }
+
+    
+type RuntimeError = NoMemoryValue Int
+
+

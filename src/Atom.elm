@@ -4,6 +4,7 @@ module Atom exposing ( Sign(..)
                      , Byte
                      , byte
                      , value
+                     , mixBase
                      )
 
 type alias Base = Int
@@ -35,8 +36,14 @@ baseContract b (s,ns) = case s of
                             Neg -> negate <| baseContractUnsigned b ns
 
 
--- each byte holds 64 distinct values
-mixBase = 2^6
+-- each byte can hold 100 distinct values
+mixBase = 10^2
+
+{-
+Note:
+Using mixBase = 10^2 seems like a good design choice.
+It allows us to gauge the value of a register by inspecting the sequence of bytes.
+-}
 
 type Byte = Byte Int
 
