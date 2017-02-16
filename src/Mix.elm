@@ -106,6 +106,94 @@ type alias Mix = { a   : BigRegister
                  , comparison : ComparisonIndicator
                  }
 
+{-
+
+execution cycle:
+  get instruction; increment program counter
+  decode instruction
+  execute instruction
+-}
+
+
+type RuntimeError = NoMemoryValue Address
+                  | InvalidModification Modification
+                  | UnrecognizedInstructionCode InstructionCode
+                  | InvalidIndex Index
+                  | InvalidMask LeftMask RightMask
+
+{-
+
+when adding an instruction, you need to update
+  decodeInstruction
+  executeInstruction
+-}
+
+type Instruction = LoadA Address Index LeftMask RightMask
+                 | LoadX Address Index LeftMask RightMask
+
+
+
+step : Mix -> Result RuntimeError Mix
+step s = case getInstruction s of
+             Err err -> Err err
+             Ok (ss,r) -> case decodeInstruction r of
+                              Err err -> Err err
+                              Ok i -> executeInstruction i ss
+
+getInstruction : Mix -> Result RuntimeError (Mix,BigRegister)
+getInstruction s = case Dict.get s.p s.mem of
+                       Nothing -> Err <| NoMemoryValue s.p
+                       Just r  -> Ok ( { s | p = s.p + 1 }, r)
+
+decodeInstruction : BigRegister -> Result RuntimeError Instruction
+decodeInstruction r =
+    case unpackBig r of
+        (a,i,m,8) -> case getMasks m of
+                         Err err  -> Err err
+                         Ok (l,r) -> Ok <| LoadA a i l r
+        (a,i,m,15) -> case getMasks m of
+                          Err err  -> Err err
+                          Ok (l,r) -> Ok <| LoadX a i l r
+        (_,_,_,c) -> Err <| UnrecognizedInstructionCode c
+        
+
+executeInstruction : Instruction -> Mix -> Result RuntimeError Mix
+executeInstruction inst s =
+    case inst of
+        LoadA a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                             Err err -> Err err
+                             Ok v -> case Dict.get (a+v) s.mem of
+                                         Nothing -> Err <| NoMemoryValue (a+v)
+                                         Just br -> case mask l r br of
+                                                        Err err -> Err err
+                                                        Ok newA -> Ok { s
+                                                                      | a = newA
+                                                                      }
+        LoadX a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                             Err err -> Err err
+                             Ok v -> case Dict.get (a+v) s.mem of
+                                         Nothing -> Err <| NoMemoryValue (a+v)
+                                         Just br  -> case mask l r br of
+                                                        Err err -> Err err
+                                                        Ok newX -> Ok { s
+                                                                      | x = newX
+                                                                      }
+
+
+getIndexRegister : Index -> Mix -> Result RuntimeError SmallRegister
+getIndexRegister i m =
+    case i of
+        0 -> Ok (Pos,byte 0,byte 0)
+        1 -> Ok m.i1
+        2 -> Ok m.i2
+        3 -> Ok m.i3
+        4 -> Ok m.i4
+        5 -> Ok m.i5
+        6 -> Ok m.i6
+        _ -> Err <| InvalidIndex i
+    
+
+
 testLoadA : Mix
 testLoadA = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
                 sr = (Pos, byte 0, byte 0)
@@ -127,67 +215,24 @@ testLoadA = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
                , comparison = E
                }
 
-{-
+testLoadX : Mix
+testLoadX = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
+                sr = (Pos, byte 0, byte 0)
+                m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 0,byte 29,byte 15))
+                                  , (2000,(Neg,byte 0,byte 80,byte 3,byte 5,byte 4))
+                                  ]
+            in { a = br
+               , x = br
+               , i1 = sr
+               , i2 = sr
+               , i3 = sr
+               , i4 = sr
+               , i5 = sr
+               , i6 = sr
+               , j = sr
+               , p = 0
+               , mem = m
+               , overflow = Good
+               , comparison = E
+               }
 
-execution cycle:
-  get instruction; increment program counter
-  decode instruction
-  execute instruction
--}
-
-step : Mix -> Result RuntimeError Mix
-step s = case getInstruction s of
-             Err err -> Err err
-             Ok (ss,r) -> case decodeInstruction r of
-                              Err err -> Err err
-                              Ok i -> executeInstruction i ss
-
-getInstruction : Mix -> Result RuntimeError (Mix,BigRegister)
-getInstruction s = case Dict.get s.p s.mem of
-                       Nothing -> Err <| NoMemoryValue s.p
-                       Just r  -> Ok ( { s | p = s.p + 1 }, r)
-
-decodeInstruction : BigRegister -> Result RuntimeError Instruction
-decodeInstruction r =
-    case unpackBig r of
-        (a,i,m,8) -> case getMasks m of
-                         Err err  -> Err err
-                         Ok (l,r) -> Ok <| LoadA a i l r
-        (_,_,_,c) -> Err <| UnrecognizedInstructionCode c
-        
-
-executeInstruction : Instruction -> Mix -> Result RuntimeError Mix
-executeInstruction inst s =
-    case inst of
-        LoadA a i l r -> case Result.map readSmall <| getIndexRegister i s of
-                             Err err -> Err err
-                             Ok v -> case Dict.get (a+v) s.mem of
-                                         Nothing -> Err <| NoMemoryValue (a+v)
-                                         Just aa -> case mask l r aa of
-                                                        Err err -> Err err
-                                                        Ok newA -> Ok { s
-                                                                      | a = newA
-                                                                      }
-
-
-getIndexRegister : Index -> Mix -> Result RuntimeError SmallRegister
-getIndexRegister i m =
-    case i of
-        0 -> Ok (Pos,byte 0,byte 0)
-        1 -> Ok m.i1
-        2 -> Ok m.i2
-        3 -> Ok m.i3
-        4 -> Ok m.i4
-        5 -> Ok m.i5
-        6 -> Ok m.i6
-        _ -> Err <| InvalidIndex i
-    
-
-
-type RuntimeError = NoMemoryValue Address
-                  | InvalidModification Modification
-                  | UnrecognizedInstructionCode InstructionCode
-                  | InvalidIndex Index
-                  | InvalidMask LeftMask RightMask
-
-type Instruction = LoadA Address Index LeftMask RightMask
