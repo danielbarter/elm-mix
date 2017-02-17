@@ -157,7 +157,12 @@ storeBig l r (msn,m1,m2,m3,m4,m5) (asn,a1,a2,a3,a4,a5)
           (5,5) -> Ok (msn,m1,m2,m3,m4,a5)
           _ -> Err <| InvalidMask l r
 
-
+storeSmall : LeftMask
+           -> RightMask
+           -> BigRegister
+           -> SmallRegister
+           -> Result RuntimeError BigRegister
+storeSmall l r b (s,i1,i2) = storeBig l r b (s,byte 0,byte 0,byte 0,i1,i2)
                 
 type alias Memory = Dict.Dict Address BigRegister
 
@@ -218,7 +223,15 @@ type Instruction = LoadA Address Index LeftMask RightMask
                  | LoadI5Neg Address Index LeftMask RightMask
                  | LoadI6Neg Address Index LeftMask RightMask
                  | StoreA Address Index LeftMask RightMask
+                 | StoreX Address Index LeftMask RightMask
+                 | StoreI1 Address Index LeftMask RightMask
+                 | StoreI2 Address Index LeftMask RightMask
+                 | StoreI3 Address Index LeftMask RightMask
+                 | StoreI4 Address Index LeftMask RightMask
+                 | StoreI5 Address Index LeftMask RightMask
+                 | StoreI6 Address Index LeftMask RightMask
 
+                   
 step : Mix -> Result RuntimeError Mix
 step s = case getInstruction s of
              Err err -> Err err
@@ -285,6 +298,27 @@ decodeInstruction r =
         (a,i,m,24) -> case getMasks m of
                           Err err  -> Err err
                           Ok (l,r) -> Ok <| StoreA a i l r
+        (a,i,m,31) -> case getMasks m of
+                          Err err  -> Err err
+                          Ok (l,r) -> Ok <| StoreX a i l r
+        (a,i,m,25) -> case getMasks m of
+                         Err err  -> Err err
+                         Ok (l,r) -> Ok <| StoreI1 a i l r
+        (a,i,m,26) -> case getMasks m of
+                         Err err  -> Err err
+                         Ok (l,r) -> Ok <| StoreI2 a i l r 
+        (a,i,m,27) -> case getMasks m of
+                         Err err  -> Err err
+                         Ok (l,r) -> Ok <| StoreI3 a i l r
+        (a,i,m,28) -> case getMasks m of
+                         Err err  -> Err err
+                         Ok (l,r) -> Ok <| StoreI4 a i l r
+        (a,i,m,29) -> case getMasks m of
+                         Err err  -> Err err
+                         Ok (l,r) -> Ok <| StoreI5 a i l r
+        (a,i,m,30) -> case getMasks m of
+                         Err err  -> Err err
+                         Ok (l,r) -> Ok <| StoreI6 a i l r
         (_,_,_,c) -> Err <| UnrecognizedInstructionCode c
         
 
@@ -449,9 +483,99 @@ executeInstruction inst s =
                                                         Ok mm -> Ok { s
                                                                     | mem = Dict.insert (a+v) mm s.mem
                                                                     }
+        StoreX a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                              Err err -> Err err
+                              Ok v -> case Dict.get (a+v) s.mem of
+                                          Nothing -> case (storeBig l r (Pos,byte 0,byte 0,byte 0,byte 0,byte 0) s.x) of
+                                                         Err err -> Err err
+                                                         Ok mm -> Ok { s
+                                                                     | mem = Dict.insert (a+v) mm s.mem
+                                                                     }
+                                          Just m -> case (storeBig l r m s.x) of
+                                                        Err err -> Err err
+                                                        Ok mm -> Ok { s
+                                                                    | mem = Dict.insert (a+v) mm s.mem
+                                                                    }
+        StoreI1 a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                               Err err -> Err err
+                               Ok v -> case Dict.get (a+v) s.mem of
+                                           Nothing -> case (storeSmall l r (Pos,byte 0,byte 0,byte 0,byte 0,byte 0) s.i1) of
+                                                          Err err -> Err err
+                                                          Ok mm -> Ok { s
+                                                                      | mem = Dict.insert (a+v) mm s.mem
+                                                                      }
+                                           Just m -> case (storeSmall l r m s.i1) of
+                                                         Err err -> Err err
+                                                         Ok mm -> Ok { s
+                                                                     | mem = Dict.insert (a+v) mm s.mem
+                                                                     }
+        StoreI2 a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                               Err err -> Err err
+                               Ok v -> case Dict.get (a+v) s.mem of
+                                           Nothing -> case (storeSmall l r (Pos,byte 0,byte 0,byte 0,byte 0,byte 0) s.i2) of
+                                                          Err err -> Err err
+                                                          Ok mm -> Ok { s
+                                                                      | mem = Dict.insert (a+v) mm s.mem
+                                                                      }
+                                           Just m -> case (storeSmall l r m s.i2) of
+                                                         Err err -> Err err
+                                                         Ok mm -> Ok { s
+                                                                     | mem = Dict.insert (a+v) mm s.mem
+                                                                     }
+        StoreI3 a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                               Err err -> Err err
+                               Ok v -> case Dict.get (a+v) s.mem of
+                                           Nothing -> case (storeSmall l r (Pos,byte 0,byte 0,byte 0,byte 0,byte 0) s.i3) of
+                                                          Err err -> Err err
+                                                          Ok mm -> Ok { s
+                                                                      | mem = Dict.insert (a+v) mm s.mem
+                                                                      }
+                                           Just m -> case (storeSmall l r m s.i3) of
+                                                         Err err -> Err err
+                                                         Ok mm -> Ok { s
+                                                                     | mem = Dict.insert (a+v) mm s.mem
+                                                                     }
+        StoreI4 a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                               Err err -> Err err
+                               Ok v -> case Dict.get (a+v) s.mem of
+                                           Nothing -> case (storeSmall l r (Pos,byte 0,byte 0,byte 0,byte 0,byte 0) s.i4) of
+                                                          Err err -> Err err
+                                                          Ok mm -> Ok { s
+                                                                      | mem = Dict.insert (a+v) mm s.mem
+                                                                      }
+                                           Just m -> case (storeSmall l r m s.i4) of
+                                                         Err err -> Err err
+                                                         Ok mm -> Ok { s
+                                                                     | mem = Dict.insert (a+v) mm s.mem
+                                                                     }
+        StoreI5 a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                               Err err -> Err err
+                               Ok v -> case Dict.get (a+v) s.mem of
+                                           Nothing -> case (storeSmall l r (Pos,byte 0,byte 0,byte 0,byte 0,byte 0) s.i5) of
+                                                          Err err -> Err err
+                                                          Ok mm -> Ok { s
+                                                                      | mem = Dict.insert (a+v) mm s.mem
+                                                                      }
+                                           Just m -> case (storeSmall l r m s.i5) of
+                                                         Err err -> Err err
+                                                         Ok mm -> Ok { s
+                                                                     | mem = Dict.insert (a+v) mm s.mem
+                                                                     }
+        StoreI6 a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                               Err err -> Err err
+                               Ok v -> case Dict.get (a+v) s.mem of
+                                           Nothing -> case (storeSmall l r (Pos,byte 0,byte 0,byte 0,byte 0,byte 0) s.i6) of
+                                                          Err err -> Err err
+                                                          Ok mm -> Ok { s
+                                                                      | mem = Dict.insert (a+v) mm s.mem
+                                                                      }
+                                           Just m -> case (storeSmall l r m s.i6) of
+                                                         Err err -> Err err
+                                                         Ok mm -> Ok { s
+                                                                     | mem = Dict.insert (a+v) mm s.mem
+                                                                     } 
 
-
-                                                                   
+                                                                  
 getIndexRegister : Index -> Mix -> Result RuntimeError SmallRegister
 getIndexRegister i m =
     case i of
@@ -559,6 +683,27 @@ testStoreA = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
                                    ]
              in { a = (Pos,byte 6,byte 7,byte 8,byte 9,byte 0)
                 , x = br
+                , i1 = sr
+                , i2 = sr
+                , i3 = (Neg,byte 01,byte 01)
+                , i4 = sr
+                , i5 = sr
+                , i6 = sr
+                , j = sr
+                , p = 0
+                , mem = m
+                , overflow = Good
+                , comparison = E
+                }
+
+testStoreX : Mix
+testStoreX = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
+                 sr = (Pos, byte 0, byte 0)
+                 m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 3,byte 20,byte 31))
+                                   , (1899,(Neg,byte 1,byte 2,byte 3,byte 4,byte 5))
+                                   ]
+             in { a = br
+                , x = (Pos,byte 6,byte 7,byte 8,byte 9,byte 0)
                 , i1 = sr
                 , i2 = sr
                 , i3 = (Neg,byte 01,byte 01)
