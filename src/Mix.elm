@@ -85,7 +85,37 @@ mask l r (s,b1,b2,b3,b4,b5) =
            (4,5) -> Ok (Pos,zero,zero,zero,b4,b5)
            (5,5) -> Ok (Pos,zero,zero,zero,zero,b5)
            _ -> Err <| InvalidMask l r
-                       
+
+maskSmall : LeftMask
+          -> RightMask
+          -> BigRegister
+          -> Result RuntimeError SmallRegister
+maskSmall l r (s,b1,b2,b3,b4,b5) =
+    let zero = byte 0
+    in case (l,r) of
+           (0,0) -> Ok (s,zero,zero)
+           (0,1) -> Ok (s,zero,b1)
+           (0,2) -> Ok (s,b1,b2)
+           (0,3) -> Ok (s,b2,b3)
+           (0,4) -> Ok (s,b3,b4)
+           (0,5) -> Ok (s,b4,b5)
+           (1,1) -> Ok (Pos,zero,b1)
+           (1,2) -> Ok (Pos,b1,b2)
+           (1,3) -> Ok (Pos,b2,b3)
+           (1,4) -> Ok (Pos,b3,b4)
+           (1,5) -> Ok (Pos,b4,b5)
+           (2,2) -> Ok (Pos,zero,b2)
+           (2,3) -> Ok (Pos,b2,b3)
+           (2,4) -> Ok (Pos,b3,b4)
+           (2,5) -> Ok (Pos,b4,b5)
+           (3,3) -> Ok (Pos,zero,b3)
+           (3,4) -> Ok (Pos,b3,b4)
+           (3,5) -> Ok (Pos,b4,b5)
+           (4,4) -> Ok (Pos,zero,b4)
+           (4,5) -> Ok (Pos,b4,b5)
+           (5,5) -> Ok (Pos,zero,b5)
+           _ -> Err <| InvalidMask l r
+                
 type alias Memory = Dict.Dict Address BigRegister
 
 type OverflowToggle = Overflow | Good
@@ -130,7 +160,7 @@ when adding an instruction, you need to update
 
 type Instruction = LoadA Address Index LeftMask RightMask
                  | LoadX Address Index LeftMask RightMask
-
+                 | LoadI1 Address Index LeftMask RightMask
 
 
 step : Mix -> Result RuntimeError Mix
@@ -154,6 +184,9 @@ decodeInstruction r =
         (a,i,m,15) -> case getMasks m of
                           Err err  -> Err err
                           Ok (l,r) -> Ok <| LoadX a i l r
+        (a,i,m,9) -> case getMasks m of
+                         Err err  -> Err err
+                         Ok (l,r) -> Ok <| LoadI1 a i l r
         (_,_,_,c) -> Err <| UnrecognizedInstructionCode c
         
 
@@ -178,6 +211,15 @@ executeInstruction inst s =
                                                         Ok newX -> Ok { s
                                                                       | x = newX
                                                                       }
+        LoadI1 a i l r -> case Result.map readSmall <| getIndexRegister i s of
+                              Err err -> Err err
+                              Ok v -> case Dict.get (a+v) s.mem of
+                                          Nothing -> Err <| NoMemoryValue (a+v)
+                                          Just br  -> case maskSmall l r br of
+                                                         Err err -> Err err
+                                                         Ok newI1 -> Ok { s
+                                                                        | i1 = newI1
+                                                                        }
 
 
 getIndexRegister : Index -> Mix -> Result RuntimeError SmallRegister
@@ -218,14 +260,14 @@ testLoadA = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
 testLoadX : Mix
 testLoadX = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
                 sr = (Pos, byte 0, byte 0)
-                m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 0,byte 29,byte 15))
-                                  , (2000,(Neg,byte 0,byte 80,byte 3,byte 5,byte 4))
+                m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 3,byte 29,byte 15))
+                                  , (1899,(Neg,byte 0,byte 80,byte 3,byte 5,byte 4))
                                   ]
             in { a = br
                , x = br
                , i1 = sr
                , i2 = sr
-               , i3 = sr
+               , i3 = (Neg,byte 01,byte 01)
                , i4 = sr
                , i5 = sr
                , i6 = sr
@@ -235,4 +277,25 @@ testLoadX = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
                , overflow = Good
                , comparison = E
                }
+
+testLoadI1 : Mix
+testLoadI1 = let br = (Pos,byte 0,byte 0,byte 0,byte 0,byte 0)
+                 sr = (Pos, byte 0, byte 0)
+                 m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 3,byte 5,byte 9))
+                                   , (1899,(Neg,byte 0,byte 80,byte 3,byte 5,byte 4))
+                                   ]
+             in { a = br
+                , x = br
+                , i1 = sr
+                , i2 = sr
+                , i3 = (Neg,byte 01,byte 01)
+                , i4 = sr
+                , i5 = sr
+                , i6 = sr
+                , j = sr
+                , p = 0
+                , mem = m
+                , overflow = Good
+                , comparison = E
+                }
 
