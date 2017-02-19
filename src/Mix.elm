@@ -27,6 +27,8 @@ import Atom exposing ( Base
                      , smallWordValue
                      , byteToMasks
                      , masksToByte
+                     , flipSignWord
+                     , flipSignSmallWord
                      )
 {-
 
@@ -108,6 +110,20 @@ incrementCounter =
 
 type Instruction = LoadA Address Masks
                  | LoadX Address Masks
+                 | LoadI1 Address Masks
+                 | LoadI2 Address Masks
+                 | LoadI3 Address Masks
+                 | LoadI4 Address Masks
+                 | LoadI5 Address Masks
+                 | LoadI6 Address Masks
+                 | LoadANeg Address Masks
+                 | LoadXNeg Address Masks
+                 | LoadI1Neg Address Masks
+                 | LoadI2Neg Address Masks
+                 | LoadI3Neg Address Masks
+                 | LoadI4Neg Address Masks
+                 | LoadI5Neg Address Masks
+                 | LoadI6Neg Address Masks
 
 {-
 
@@ -122,6 +138,20 @@ decodeInstruction (a,f,ms,c) =
     case c of
         8  -> return <| LoadA a ms
         15 -> return <| LoadX a ms
+        9  -> return <| LoadI1 a ms
+        10 -> return <| LoadI2 a ms
+        11 -> return <| LoadI3 a ms
+        12 -> return <| LoadI4 a ms
+        13 -> return <| LoadI5 a ms
+        14 -> return <| LoadI6 a ms
+        16 -> return <| LoadANeg a ms
+        23 -> return <| LoadXNeg a ms
+        17 -> return <| LoadI1Neg a ms
+        18 -> return <| LoadI2Neg a ms
+        19 -> return <| LoadI3Neg a ms
+        20 -> return <| LoadI4Neg a ms
+        21 -> return <| LoadI5Neg a ms
+        22 -> return <| LoadI6Neg a ms
         x  -> throwError <| UnrecognizedInstructionCode x
 
 
@@ -134,6 +164,59 @@ executeInstructionTransition i s =
             -> { s | a = copy masks (read adr s.mem) s.a }
         LoadX adr masks
             -> { s | x = copy masks (read adr s.mem) s.x }
+        LoadI1 adr masks
+            -> { s | i1 = wordContract
+                        <| copy masks (read adr s.mem)
+                        <| wordExpand s.i1 }
+        LoadI2 adr masks
+            -> { s | i2 = wordContract
+                        <| copy masks (read adr s.mem)
+                        <| wordExpand s.i2 }
+        LoadI3 adr masks
+            -> { s | i3 = wordContract
+                        <| copy masks (read adr s.mem)
+                        <| wordExpand s.i3 }
+        LoadI4 adr masks
+            -> { s | i4 = wordContract
+                        <| copy masks (read adr s.mem)
+                        <| wordExpand s.i4 }
+        LoadI5 adr masks
+            -> { s | i5 = wordContract
+                        <| copy masks (read adr s.mem)
+                        <| wordExpand s.i5 }
+        LoadI6 adr masks
+            -> { s | i6 = wordContract
+                        <| copy masks (read adr s.mem)
+                        <| wordExpand s.i6 }
+        LoadANeg adr masks
+            -> { s | a = copy masks (flipSignWord <| read adr s.mem) s.a }
+        LoadXNeg adr masks
+            -> { s | x = copy masks (flipSignWord <| read adr s.mem) s.x }
+        LoadI1Neg adr masks
+            -> { s | i1 = wordContract
+                        <| copy masks (flipSignWord <| read adr s.mem)
+                        <| wordExpand s.i1 }
+        LoadI2Neg adr masks
+            -> { s | i2 = wordContract
+                        <| copy masks (flipSignWord <| read adr s.mem)
+                        <| wordExpand s.i2 }
+        LoadI3Neg adr masks
+            -> { s | i3 = wordContract
+                        <| copy masks (flipSignWord <| read adr s.mem)
+                        <| wordExpand s.i3 }
+        LoadI4Neg adr masks
+            -> { s | i4 = wordContract
+                        <| copy masks (flipSignWord <| read adr s.mem)
+                        <| wordExpand s.i4 }
+        LoadI5Neg adr masks
+            -> { s | i5 = wordContract
+                        <| copy masks (flipSignWord <| read adr s.mem)
+                        <| wordExpand s.i5 }
+        LoadI6Neg adr masks
+            -> { s | i6 = wordContract
+                        <| copy masks (flipSignWord <| read adr s.mem)
+                        <| wordExpand s.i6 }
+
 
 
 
@@ -205,9 +288,9 @@ map2 f p q = ( f <$> p ) <*> q
 testLoad : Mix
 testLoad =
     let
-        b = masksToByte (On,Off,On,Off,Off,On)
-        m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 1,b,byte 15))
-                          , (1899,(Neg,byte 1,byte 2,byte 3,byte 4,byte 5))
+        b = masksToByte (On,Off,Off,Off,Off,Off)
+        m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 1,b,byte 23))
+                          , (1899,(Pos,byte 1,byte 2,byte 3,byte 4,byte 5))
                           ]
     in { a = zeroWord
        , x = zeroWord

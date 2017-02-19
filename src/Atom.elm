@@ -23,6 +23,8 @@ module Atom exposing ( Base
                      , smallWordValue
                      , byteToMasks
                      , masksToByte
+                     , flipSignWord
+                     , flipSignSmallWord
                      )
 
 type alias Base = Int
@@ -114,6 +116,22 @@ wordExpand (s,i1,i2) = (s,zero,zero,zero,i1,i2)
 wordContract : Word -> SmallWord
 wordContract (s,a1,a2,a3,a4,a5) = (s,a4,a5)
 
+flipSignWord : Word -> Word
+flipSignWord w = map6
+                 swap
+                 identity
+                 identity
+                 identity
+                 identity
+                 identity w
+
+flipSignSmallWord : SmallWord -> SmallWord
+flipSignSmallWord w = map3
+                      swap
+                      identity
+                      identity w
+
+
 {-
 
 Knuth uses a somewhat strange masking convention. We can do better!
@@ -188,7 +206,7 @@ copy (m1,m2,m3,m4,m5,m6) w1 w2 =
     (maskFilter m4)
     (maskFilter m5)
     (maskFilter m6) w1 w2
-
+        
 map3 : (a1 -> b1) -> (a2 -> b2) -> (a3 -> b3) -> (a1,a2,a3) -> (b1,b2,b3)
 map3 f g h (x,y,z) = (f x, g y, h z)
 
