@@ -8,6 +8,8 @@ module Atom exposing ( Base
                      , Byte
                      , byte
                      , zero
+                     , zeroWord
+                     , zeroSmallWord
                      , value
                      , SmallWord
                      , Word
@@ -19,6 +21,8 @@ module Atom exposing ( Base
                      , copy
                      , wordValue
                      , smallWordValue
+                     , byteToMasks
+                     , masksToByte
                      )
 
 type alias Base = Int
@@ -92,7 +96,9 @@ byte : Int -> Byte
 byte n = Byte <| n % mixBase
 
 zero = byte 0
-         
+zeroWord = (Pos,zero,zero,zero,zero,zero)
+zeroSmallWord = (Pos,zero,zero)
+       
 value : Byte -> Int
 value (Byte v) = v
 
@@ -125,7 +131,39 @@ maskFilter m x y = case m of
                        On -> y
                        Off -> x
 
-    
+masksToByte : Masks -> Byte
+masksToByte (m1,m2,m3,m4,m5,m6) =
+    let f m = case m of
+                  Off -> 0
+                  On -> 1
+    in byte <| baseContract 2 (Pos,List.map f [m1,m2,m3,m4,m5,m6])
+                              
+byteToMasks : Byte -> Masks 
+byteToMasks (Byte n) =
+    let bitToMask i = if i == 0 then Off else On
+    in case baseExpandPad 2 n 6 of
+           (s,[m1,m2,m3,m4,m5,m6]) -> ( bitToMask m1
+                                      , bitToMask m2
+                                      , bitToMask m3
+                                      , bitToMask m4
+                                      , bitToMask m5
+                                      , bitToMask m6
+                                      )
+           (s,[m0,m1,m2,m3,m4,m5,m6]) -> ( bitToMask m1
+                                         , bitToMask m2
+                                         , bitToMask m3
+                                         , bitToMask m4
+                                         , bitToMask m5
+                                         , bitToMask m6
+                                         )
+           _                       -> ( Off
+                                      , Off
+                                      , Off
+                                      , Off
+                                      , Off
+                                      , Off
+                                      )
+
 wordValue : Word -> Int
 wordValue (s,b1,b2,b3,b4,b5) =
     baseContract mixBase (s, List.map value [b1,b2,b3,b4,b5])
