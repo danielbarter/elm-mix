@@ -107,12 +107,22 @@ incrementCounter =
 
 
 type Instruction = LoadA Address Masks
+                 | LoadX Address Masks
 
+{-
+
+when adding a new instruction, you need to update
+  decodeInstruction
+  executeInstructionTransition
+
+-}
+    
 decodeInstruction : UnpackedWord -> MixOperation Instruction
 decodeInstruction (a,f,ms,c) =
     case c of
-        8 -> return <| LoadA a ms
-        x -> throwError <| UnrecognizedInstructionCode x
+        8  -> return <| LoadA a ms
+        15 -> return <| LoadX a ms
+        x  -> throwError <| UnrecognizedInstructionCode x
 
 
 
@@ -122,6 +132,8 @@ executeInstructionTransition i s =
     case i of
         LoadA adr masks
             -> { s | a = copy masks (read adr s.mem) s.a }
+        LoadX adr masks
+            -> { s | x = copy masks (read adr s.mem) s.x }
 
 
 
@@ -190,16 +202,16 @@ map2 f p q = ( f <$> p ) <*> q
 
 
 -- test states
-testLoadA : Mix
-testLoadA =
+testLoad : Mix
+testLoad =
     let
-        b = masksToByte (On,Off,On,Off,Off,Off)
-        m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 0,b,byte 8))
-                          , (2000,(Neg,byte 1,byte 2,byte 3,byte 4,byte 5))
+        b = masksToByte (On,Off,On,Off,Off,On)
+        m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 1,b,byte 15))
+                          , (1899,(Neg,byte 1,byte 2,byte 3,byte 4,byte 5))
                           ]
     in { a = zeroWord
        , x = zeroWord
-       , i1 = zeroSmallWord
+       , i1 = (Neg,byte 1,byte 1)
        , i2 = zeroSmallWord
        , i3 = zeroSmallWord
        , i4 = zeroSmallWord
