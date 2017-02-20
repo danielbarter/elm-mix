@@ -124,6 +124,16 @@ type Instruction = LoadA Address Masks
                  | LoadI4Neg Address Masks
                  | LoadI5Neg Address Masks
                  | LoadI6Neg Address Masks
+                 | StoreA Address Masks
+                 | StoreX Address Masks
+                 | StoreI1 Address Masks
+                 | StoreI2 Address Masks
+                 | StoreI3 Address Masks
+                 | StoreI4 Address Masks
+                 | StoreI5 Address Masks
+                 | StoreI6 Address Masks
+                 | StoreJ Address Masks
+                 | StoreZero Address Masks
 
 {-
 
@@ -152,6 +162,16 @@ decodeInstruction (a,f,ms,c) =
         20 -> return <| LoadI4Neg a ms
         21 -> return <| LoadI5Neg a ms
         22 -> return <| LoadI6Neg a ms
+        24 -> return <| StoreA a ms
+        31 -> return <| StoreX a ms
+        25 -> return <| StoreI1 a ms
+        26 -> return <| StoreI2 a ms
+        27 -> return <| StoreI3 a ms
+        28 -> return <| StoreI4 a ms
+        29 -> return <| StoreI5 a ms
+        30 -> return <| StoreI6 a ms
+        32 -> return <| StoreJ a ms
+        33 -> return <| StoreZero a ms
         x  -> throwError <| UnrecognizedInstructionCode x
 
 
@@ -216,6 +236,56 @@ executeInstructionTransition i s =
             -> { s | i6 = wordContract
                         <| copy masks (flipSignWord <| read adr s.mem)
                         <| wordExpand s.i6 }
+        StoreA adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks s.a <| read adr s.mem)
+                     s.mem
+               }
+        StoreX adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks s.x <| read adr s.mem)
+                     s.mem
+               }
+        StoreI1 adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks (wordExpand s.i1) <| read adr s.mem)
+                     s.mem
+               }
+        StoreI2 adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks (wordExpand s.i2) <| read adr s.mem)
+                     s.mem
+               }
+        StoreI3 adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks (wordExpand s.i3) <| read adr s.mem)
+                     s.mem
+               }
+        StoreI4 adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks (wordExpand s.i4) <| read adr s.mem)
+                     s.mem
+               }
+        StoreI5 adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks (wordExpand s.i5) <| read adr s.mem)
+                     s.mem
+               }
+        StoreI6 adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks (wordExpand s.i6) <| read adr s.mem)
+                     s.mem
+               }
+        StoreJ adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks (wordExpand s.j) <| read adr s.mem)
+                     s.mem
+               }
+        StoreZero adr masks
+            -> { s | mem = Dict.insert adr
+                     (copy masks zeroWord <| read adr s.mem)
+                     s.mem
+               }
 
 
 
@@ -293,6 +363,29 @@ testLoad =
                           , (1899,(Pos,byte 1,byte 2,byte 3,byte 4,byte 5))
                           ]
     in { a = zeroWord
+       , x = zeroWord
+       , i1 = (Neg,byte 1,byte 1)
+       , i2 = zeroSmallWord
+       , i3 = zeroSmallWord
+       , i4 = zeroSmallWord
+       , i5 = zeroSmallWord
+       , i6 = zeroSmallWord
+       , j = zeroSmallWord
+       , p = 0
+       , mem = m
+       , overflow = Good
+       , comparison = E
+       }
+
+
+testStore : Mix
+testStore =
+    let
+        b = masksToByte (On,Off,On,Off,Off,Off)
+        m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 1,b,byte 25))
+                          , (1899,(Pos,byte 1,byte 2,byte 3,byte 4,byte 5))
+                          ]
+    in { a = (Pos,byte 6,byte 7,byte 8,byte 9,byte 0)
        , x = zeroWord
        , i1 = (Neg,byte 1,byte 1)
        , i2 = zeroSmallWord
