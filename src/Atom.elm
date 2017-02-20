@@ -28,6 +28,8 @@ module Atom exposing ( Base
                      , OverflowToggle(..)
                      , ComparisonIndicator(..)
                      , op
+                     , intToWord
+                     , intToSmallWord
                      )
 
 type alias Base = Int
@@ -192,7 +194,11 @@ wordValue (s,b1,b2,b3,b4,b5) =
 smallWordValue : SmallWord -> Int
 smallWordValue (s,b1,b2) =
     baseContract mixBase (s,List.map value [b1,b2])
-   
+
+
+ 
+
+
 {-
 
 In copy ms w1 w2, we are imprinting w1 onto w2.
@@ -214,19 +220,35 @@ copy (m1,m2,m3,m4,m5,m6) w1 w2 =
 type OverflowToggle = Overflow | Good | Ignored
 type ComparisonIndicator = L | E | G
 
+intToWord : Int -> Word -> (OverflowToggle,Word)
+intToWord n default =
+    let (s,vs) = baseExpandPad mixBase n 6
+        l = List.length vs
+    in case List.drop (l-6) vs of
+           0::[v1,v2,v3,v4,v5]
+               -> (Good,(s,byte v1,byte v2,byte v3,byte v4,byte v5))
+           x::[v1,v2,v3,v4,v5]
+               -> (Overflow,(s,byte v1,byte v2,byte v3,byte v4,byte v5))
+           _   -> (Ignored,default)
+
+intToSmallWord : Int -> SmallWord -> (OverflowToggle,SmallWord)
+intToSmallWord n default =
+    let (s,vs) = baseExpandPad mixBase n 3
+        l = List.length vs
+    in case List.drop (l-3) vs of
+           0::[v1,v2]
+               -> (Good,(s,byte v1,byte v2))
+           x::[v1,v2]
+               -> (Overflow,(s,byte v1,byte v2))
+           _   -> (Ignored,default)
+
 -- we use the mask on the second value
 op : (Int -> Int -> Int) -> Masks -> Word -> Word -> (OverflowToggle,Word)
 op op masks a m =
     let mm = copy masks m zeroWord
         aValue = wordValue a
         mmValue = wordValue mm
-        (s,vs) = baseExpandPad mixBase (op aValue mmValue) 6
-    in case vs of
-           0::[v1,v2,v3,v4,v5]
-               -> (Good,(s,byte v1,byte v2,byte v3,byte v4,byte v5))
-           x::[v1,v2,v3,v4,v5]
-               -> (Overflow,(s,byte v1,byte v2,byte v3,byte v4,byte v5))
-           _ -> (Ignored,a)
+    in intToWord (op aValue mmValue) a
                 
 map3 : (a1 -> b1) -> (a2 -> b2) -> (a3 -> b3) -> (a1,a2,a3) -> (b1,b2,b3)
 map3 f g h (x,y,z) = (f x, g y, h z)

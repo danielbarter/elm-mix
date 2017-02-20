@@ -32,6 +32,8 @@ import Atom exposing ( Base
                      , OverflowToggle(..)
                      , ComparisonIndicator(..)
                      , op
+                     , intToWord
+                     , intToSmallWord
                      )
 {-
 
@@ -72,7 +74,7 @@ type alias Mix = { a   : Word
 
 type RuntimeError = NoMemoryValue Address
                   | InvalidModification Modification
-                  | UnrecognizedInstructionCode InstructionCode
+                  | UnrecognizedInstructionCode (InstructionCode,Modification)
                   | InvalidIndex Index
 
 
@@ -150,6 +152,7 @@ type Instruction = LoadA Address Masks
                  | Sub Address Masks
                  | AddX Masks
                  | SubX Masks
+                 | EnterAMod2 Address
 
 {-
 
@@ -161,37 +164,38 @@ when adding a new instruction, you need to update
     
 decodeInstruction : UnpackedWord -> MixOperation Instruction
 decodeInstruction (a,f,ms,c) =
-    case c of
-        8  -> return <| LoadA a ms
-        15 -> return <| LoadX a ms
-        9  -> return <| LoadI1 a ms
-        10 -> return <| LoadI2 a ms
-        11 -> return <| LoadI3 a ms
-        12 -> return <| LoadI4 a ms
-        13 -> return <| LoadI5 a ms
-        14 -> return <| LoadI6 a ms
-        16 -> return <| LoadANeg a ms
-        23 -> return <| LoadXNeg a ms
-        17 -> return <| LoadI1Neg a ms
-        18 -> return <| LoadI2Neg a ms
-        19 -> return <| LoadI3Neg a ms
-        20 -> return <| LoadI4Neg a ms
-        21 -> return <| LoadI5Neg a ms
-        22 -> return <| LoadI6Neg a ms
-        24 -> return <| StoreA a ms
-        31 -> return <| StoreX a ms
-        25 -> return <| StoreI1 a ms
-        26 -> return <| StoreI2 a ms
-        27 -> return <| StoreI3 a ms
-        28 -> return <| StoreI4 a ms
-        29 -> return <| StoreI5 a ms
-        30 -> return <| StoreI6 a ms
-        32 -> return <| StoreJ a ms
-        33 -> return <| StoreZero a ms
-        1  -> return <| Add a ms
-        2  -> return <| Sub a ms
-        3  -> return <| AddX ms
-        4  -> return <| SubX ms
+    case (c,f) of
+        (8,_)  -> return <| LoadA a ms
+        (15,_) -> return <| LoadX a ms
+        (9,_)  -> return <| LoadI1 a ms
+        (10,_) -> return <| LoadI2 a ms
+        (11,_) -> return <| LoadI3 a ms
+        (12,_) -> return <| LoadI4 a ms
+        (13,_) -> return <| LoadI5 a ms
+        (14,_) -> return <| LoadI6 a ms
+        (16,_) -> return <| LoadANeg a ms
+        (23,_) -> return <| LoadXNeg a ms
+        (17,_) -> return <| LoadI1Neg a ms
+        (18,_) -> return <| LoadI2Neg a ms
+        (19,_) -> return <| LoadI3Neg a ms
+        (20,_) -> return <| LoadI4Neg a ms
+        (21,_) -> return <| LoadI5Neg a ms
+        (22,_) -> return <| LoadI6Neg a ms
+        (24,_) -> return <| StoreA a ms
+        (31,_) -> return <| StoreX a ms
+        (25,_) -> return <| StoreI1 a ms
+        (26,_) -> return <| StoreI2 a ms
+        (27,_) -> return <| StoreI3 a ms
+        (28,_) -> return <| StoreI4 a ms
+        (29,_) -> return <| StoreI5 a ms
+        (30,_) -> return <| StoreI6 a ms
+        (32,_) -> return <| StoreJ a ms
+        (33,_) -> return <| StoreZero a ms
+        (1,_)  -> return <| Add a ms
+        (2,_)  -> return <| Sub a ms
+        (3,_)  -> return <| AddX ms
+        (4,_)  -> return <| SubX ms
+        (48,2) -> return <| EnterAMod2 a
         x  -> throwError <| UnrecognizedInstructionCode x
 
 
@@ -324,7 +328,12 @@ executeInstructionTransition i s =
         SubX masks
             -> let (t,r) = op (-) masks s.a <| s.x
                in { s | a = r
-                      , overflow = t
+                  , overflow = t
+                  }
+        EnterAMod2 adr
+            -> let (t,r) = intToWord adr s.a
+               in { s | a = r
+                  , overflow = t
                   }
 
 
