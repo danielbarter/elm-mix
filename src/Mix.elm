@@ -29,6 +29,9 @@ import Atom exposing ( Base
                      , masksToByte
                      , flipSignWord
                      , flipSignSmallWord
+                     , OverflowToggle(..)
+                     , ComparisonIndicator(..)
+                     , op
                      )
 {-
 
@@ -40,8 +43,7 @@ execution cycle:
 
 -}
 
-type OverflowToggle = Overflow | Good
-type ComparisonIndicator = L | E | G
+
 type alias Address = Int
 type alias Index = Int
 type alias Modification = Int
@@ -107,6 +109,16 @@ incrementCounter =
     let op m = { m | p = m.p + 1 }
     in (op <$> get) >>= put 
 
+{-
+
+design point:
+
+we are not implementing multiplication and division at a machine level.
+Instead, we have AddX and SubX.
+Multiplication / Division are easily implemented as routines.
+
+-}
+
 
 type Instruction = LoadA Address Masks
                  | LoadX Address Masks
@@ -134,6 +146,10 @@ type Instruction = LoadA Address Masks
                  | StoreI6 Address Masks
                  | StoreJ Address Masks
                  | StoreZero Address Masks
+                 | Add Address Masks
+                 | Sub Address Masks
+                 | AddX Masks
+                 | SubX Masks
 
 {-
 
@@ -172,6 +188,10 @@ decodeInstruction (a,f,ms,c) =
         30 -> return <| StoreI6 a ms
         32 -> return <| StoreJ a ms
         33 -> return <| StoreZero a ms
+        1  -> return <| Add a ms
+        2  -> return <| Sub a ms
+        3  -> return <| AddX ms
+        4  -> return <| SubX ms
         x  -> throwError <| UnrecognizedInstructionCode x
 
 
@@ -286,6 +306,26 @@ executeInstructionTransition i s =
                      (copy masks zeroWord <| read adr s.mem)
                      s.mem
                }
+        Add adr masks
+            -> let (t,r) = op (+) masks s.a <| read adr s.mem
+               in { s | a = r
+                      , overflow = t
+                  }
+        Sub adr masks
+            -> let (t,r) = op (-) masks s.a <| read adr s.mem
+               in { s | a = r
+                      , overflow = t
+                  }
+        AddX masks
+            -> let (t,r) = op (+) masks s.a <| s.x
+               in { s | a = r
+                      , overflow = t
+                  }
+        SubX masks
+            -> let (t,r) = op (-) masks s.a <| s.x
+               in { s | a = r
+                      , overflow = t
+                  }
 
 
 
@@ -386,6 +426,29 @@ testStore =
                           , (1899,(Pos,byte 1,byte 2,byte 3,byte 4,byte 5))
                           ]
     in { a = (Pos,byte 6,byte 7,byte 8,byte 9,byte 0)
+       , x = zeroWord
+       , i1 = (Neg,byte 1,byte 1)
+       , i2 = zeroSmallWord
+       , i3 = zeroSmallWord
+       , i4 = zeroSmallWord
+       , i5 = zeroSmallWord
+       , i6 = zeroSmallWord
+       , j = zeroSmallWord
+       , p = 0
+       , mem = m
+       , overflow = Good
+       , comparison = E
+       }
+
+
+testAdd : Mix
+testAdd =
+    let
+        b = masksToByte (On,Off,Off,Off,Off,Off)
+        m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 1,b,byte 1))
+                          , (1899,(Neg,byte 1,byte 2,byte 3,byte 4,byte 5))
+                          ]
+    in { a = (Pos,byte 1,byte 0,byte 0,byte 0,byte 0)
        , x = zeroWord
        , i1 = (Neg,byte 1,byte 1)
        , i2 = zeroSmallWord

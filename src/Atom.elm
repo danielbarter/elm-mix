@@ -25,6 +25,9 @@ module Atom exposing ( Base
                      , masksToByte
                      , flipSignWord
                      , flipSignSmallWord
+                     , OverflowToggle(..)
+                     , ComparisonIndicator(..)
+                     , op
                      )
 
 type alias Base = Int
@@ -206,7 +209,25 @@ copy (m1,m2,m3,m4,m5,m6) w1 w2 =
     (maskFilter m4)
     (maskFilter m5)
     (maskFilter m6) w1 w2
-        
+
+-- we should never see the Ignored toggle.
+type OverflowToggle = Overflow | Good | Ignored
+type ComparisonIndicator = L | E | G
+
+-- we use the mask on the second value
+op : (Int -> Int -> Int) -> Masks -> Word -> Word -> (OverflowToggle,Word)
+op op masks a m =
+    let mm = copy masks m zeroWord
+        aValue = wordValue a
+        mmValue = wordValue mm
+        (s,vs) = baseExpandPad mixBase (op aValue mmValue) 6
+    in case vs of
+           0::[v1,v2,v3,v4,v5]
+               -> (Good,(s,byte v1,byte v2,byte v3,byte v4,byte v5))
+           x::[v1,v2,v3,v4,v5]
+               -> (Overflow,(s,byte v1,byte v2,byte v3,byte v4,byte v5))
+           _ -> (Ignored,a)
+                
 map3 : (a1 -> b1) -> (a2 -> b2) -> (a3 -> b3) -> (a1,a2,a3) -> (b1,b2,b3)
 map3 f g h (x,y,z) = (f x, g y, h z)
 
