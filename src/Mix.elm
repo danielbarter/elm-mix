@@ -168,6 +168,7 @@ type Instruction = LoadA Address Masks
                  | EnterI4Neg Address
                  | EnterI5Neg Address
                  | EnterI6Neg Address
+                 | IncrementA Address
 {-
 
 when adding a new instruction, you need to update
@@ -175,7 +176,7 @@ when adding a new instruction, you need to update
   executeInstructionTransition
 
 -}
-    
+
 decodeInstruction : UnpackedWord -> MixOperation Instruction
 decodeInstruction (a,f,ms,c) =
     case (c,f) of
@@ -225,6 +226,7 @@ decodeInstruction (a,f,ms,c) =
         (52,3) -> return <| EnterI4Neg a
         (53,3) -> return <| EnterI5Neg a
         (54,3) -> return <| EnterI6Neg a
+        (48,0) -> return <| IncrementA a
         x  -> throwError <| UnrecognizedInstructionCode x
 
 
@@ -438,6 +440,11 @@ executeInstructionTransition i s =
             -> let (t,r) = intToSmallWord (negate adr) s.i6
                in { s | i6 = r
                   , overflow = t
+                  }
+        IncrementA adr
+            -> let (t,r) = intToWord (adr + (wordValue s.a) ) s.a
+               in { s | a = r
+                      , overflow = t
                   }
 
 
