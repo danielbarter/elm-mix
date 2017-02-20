@@ -152,8 +152,22 @@ type Instruction = LoadA Address Masks
                  | Sub Address Masks
                  | AddX Masks
                  | SubX Masks
-                 | EnterAMod2 Address
-
+                 | EnterA Address
+                 | EnterX Address
+                 | EnterI1 Address
+                 | EnterI2 Address
+                 | EnterI3 Address
+                 | EnterI4 Address
+                 | EnterI5 Address
+                 | EnterI6 Address
+                 | EnterANeg Address
+                 | EnterXNeg Address
+                 | EnterI1Neg Address
+                 | EnterI2Neg Address
+                 | EnterI3Neg Address
+                 | EnterI4Neg Address
+                 | EnterI5Neg Address
+                 | EnterI6Neg Address
 {-
 
 when adding a new instruction, you need to update
@@ -195,7 +209,22 @@ decodeInstruction (a,f,ms,c) =
         (2,_)  -> return <| Sub a ms
         (3,_)  -> return <| AddX ms
         (4,_)  -> return <| SubX ms
-        (48,2) -> return <| EnterAMod2 a
+        (48,2) -> return <| EnterA a
+        (55,2) -> return <| EnterX a
+        (49,2) -> return <| EnterI1 a
+        (50,2) -> return <| EnterI2 a
+        (51,2) -> return <| EnterI3 a
+        (52,2) -> return <| EnterI4 a
+        (53,2) -> return <| EnterI5 a
+        (54,2) -> return <| EnterI6 a
+        (48,3) -> return <| EnterANeg a
+        (55,3) -> return <| EnterXNeg a
+        (49,3) -> return <| EnterI1Neg a
+        (50,3) -> return <| EnterI2Neg a
+        (51,3) -> return <| EnterI3Neg a
+        (52,3) -> return <| EnterI4Neg a
+        (53,3) -> return <| EnterI5Neg a
+        (54,3) -> return <| EnterI6Neg a
         x  -> throwError <| UnrecognizedInstructionCode x
 
 
@@ -330,9 +359,84 @@ executeInstructionTransition i s =
                in { s | a = r
                   , overflow = t
                   }
-        EnterAMod2 adr
+        EnterA adr
             -> let (t,r) = intToWord adr s.a
                in { s | a = r
+                  , overflow = t
+                  }
+        EnterX adr
+            -> let (t,r) = intToWord adr s.x
+               in { s | x = r
+                  , overflow = t
+                  }
+        EnterI1 adr
+            -> let (t,r) = intToSmallWord adr s.i1
+               in { s | i1 = r
+                  , overflow = t
+                  }
+        EnterI2 adr
+            -> let (t,r) = intToSmallWord adr s.i2
+               in { s | i2 = r
+                  , overflow = t
+                  }
+        EnterI3 adr
+            -> let (t,r) = intToSmallWord adr s.i3
+               in { s | i3 = r
+                  , overflow = t
+                  }
+        EnterI4 adr
+            -> let (t,r) = intToSmallWord adr s.i4
+               in { s | i4 = r
+                  , overflow = t
+                  }
+        EnterI5 adr
+            -> let (t,r) = intToSmallWord adr s.i5
+               in { s | i5 = r
+                  , overflow = t
+                  }
+        EnterI6 adr
+            -> let (t,r) = intToSmallWord adr s.i6
+               in { s | i6 = r
+                  , overflow = t
+                  }
+        EnterANeg adr
+            -> let (t,r) = intToWord (negate adr) s.a
+               in { s | a = r
+                  , overflow = t
+                  }
+        EnterXNeg adr
+            -> let (t,r) = intToWord (negate adr) s.x
+               in { s | x = r
+                  , overflow = t
+                  }
+        EnterI1Neg adr
+            -> let (t,r) = intToSmallWord (negate adr) s.i1
+               in { s | i1 = r
+                  , overflow = t
+                  }
+        EnterI2Neg adr
+            -> let (t,r) = intToSmallWord (negate adr) s.i2
+               in { s | i2 = r
+                  , overflow = t
+                  }
+        EnterI3Neg adr
+            -> let (t,r) = intToSmallWord (negate adr) s.i3
+               in { s | i3 = r
+                  , overflow = t
+                  }
+        EnterI4Neg adr
+            -> let (t,r) = intToSmallWord (negate adr) s.i4
+               in { s | i4 = r
+                  , overflow = t
+                  }
+        EnterI5Neg adr
+            -> let (t,r) = intToSmallWord (negate adr) s.i5
+               in { s | i5 = r
+                  , overflow = t
+                  }
+        EnterI6Neg adr
+            -> let (t,r) = intToSmallWord (negate adr) s.i6
+               in { s | i6 = r
                   , overflow = t
                   }
 
@@ -455,6 +559,28 @@ testAdd =
     let
         b = masksToByte (On,Off,Off,Off,Off,Off)
         m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 1,b,byte 1))
+                          , (1899,(Neg,byte 1,byte 2,byte 3,byte 4,byte 5))
+                          ]
+    in { a = (Pos,byte 1,byte 0,byte 0,byte 0,byte 0)
+       , x = zeroWord
+       , i1 = (Neg,byte 1,byte 1)
+       , i2 = zeroSmallWord
+       , i3 = zeroSmallWord
+       , i4 = zeroSmallWord
+       , i5 = zeroSmallWord
+       , i6 = zeroSmallWord
+       , j = zeroSmallWord
+       , p = 0
+       , mem = m
+       , overflow = Good
+       , comparison = E
+       }
+
+
+testEnter : Mix
+testEnter =
+    let
+        m = Dict.fromList [ (0,(Neg,byte 20,byte 0,byte 1,byte 2,byte 54))
                           , (1899,(Neg,byte 1,byte 2,byte 3,byte 4,byte 5))
                           ]
     in { a = (Pos,byte 1,byte 0,byte 0,byte 0,byte 0)
