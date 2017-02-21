@@ -194,6 +194,15 @@ type Instruction = LoadA Address Masks
                  | CompareI5 Address Masks
                  | CompareI6 Address Masks
                  | Jump Address
+                 | JumpSaveJ Address
+                 | JumpOnOverflow Address
+                 | JumpOnNoOverflow Address
+                 | JumpOnLess Address
+                 | JumpOnEqual Address
+                 | JumpOnGreater Address
+                 | JumpOnGreaterEqual Address
+                 | JumpOnUnEqual Address
+                 | JumpOnLessEqual Address
 
 
 {-
@@ -295,6 +304,15 @@ decodeInstruction (a,f,ms,c) =
                   y -> throwError <| InvalidModification f
         39 -> case f of
                   0 -> return <| Jump a
+                  1 -> return <| JumpSaveJ a
+                  2 -> return <| JumpOnOverflow a
+                  3 -> return <| JumpOnNoOverflow a
+                  4 -> return <| JumpOnLess a
+                  5 -> return <| JumpOnEqual a
+                  6 -> return <| JumpOnGreater a
+                  7 -> return <| JumpOnGreaterEqual a
+                  8 -> return <| JumpOnUnEqual a
+                  9 -> return <| JumpOnLessEqual a
                   y -> throwError <| InvalidModification f
         x  -> throwError <| UnrecognizedInstructionCode x
 
@@ -620,6 +638,73 @@ executeInstructionTransition i s =
                   | p = adr
                   , j = newJ
                   }
+        JumpSaveJ adr
+            -> { s | p = adr }
+        JumpOnOverflow adr
+            -> if s.overflow == Overflow
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       , overflow = Good
+                       }
+               else s
+        JumpOnNoOverflow adr
+            -> if s.overflow == Good
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else { s | overflow = Good }
+        JumpOnLess adr
+            -> if s.comparison == L
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpOnEqual adr
+            -> if s.comparison == E
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpOnGreater adr
+            -> if s.comparison == G
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpOnGreaterEqual adr
+            -> if (s.comparison == G) || (s.comparison == E)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpOnUnEqual adr
+            -> if (s.comparison == L) || (s.comparison == G)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpOnLessEqual adr
+            -> if (s.comparison == L) || (s.comparison == E)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
 
 
 
@@ -767,6 +852,28 @@ testEnter =
     in { a = (Pos,byte 1,byte 0,byte 0,byte 0,byte 0)
        , x = zeroWord
        , i1 = (Neg,byte 1,byte 1)
+       , i2 = zeroSmallWord
+       , i3 = zeroSmallWord
+       , i4 = zeroSmallWord
+       , i5 = zeroSmallWord
+       , i6 = zeroSmallWord
+       , j = zeroSmallWord
+       , p = 0
+       , mem = m
+       , overflow = Good
+       , comparison = E
+       }
+
+
+testJump : Mix
+testJump =
+    let
+        m = Dict.fromList [ (0,(Pos,byte 0,byte 53,byte 1,byte 0,byte 39))
+                          , (1899,(Neg,byte 1,byte 2,byte 3,byte 4,byte 5))
+                          ]
+    in { a = (Pos,byte 1,byte 0,byte 0,byte 0,byte 0)
+       , x = zeroWord
+       , i1 = (Pos,byte 1,byte 1)
        , i2 = zeroSmallWord
        , i3 = zeroSmallWord
        , i4 = zeroSmallWord
