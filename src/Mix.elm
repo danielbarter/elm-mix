@@ -203,6 +203,12 @@ type Instruction = LoadA Address Masks
                  | JumpOnGreaterEqual Address
                  | JumpOnUnEqual Address
                  | JumpOnLessEqual Address
+                 | JumpANegative Address
+                 | JumpAZero Address
+                 | JumpAPositive Address
+                 | JumpANonNegative Address
+                 | JumpANonZero Address
+                 | JumpANonPositive Address
 
 
 {-
@@ -313,6 +319,14 @@ decodeInstruction (a,f,ms,c) =
                   7 -> return <| JumpOnGreaterEqual a
                   8 -> return <| JumpOnUnEqual a
                   9 -> return <| JumpOnLessEqual a
+                  y -> throwError <| InvalidModification f
+        40 -> case f of
+                  0 -> return <| JumpANegative a
+                  1 -> return <| JumpAZero a
+                  2 -> return <| JumpAPositive a
+                  3 -> return <| JumpANonNegative a
+                  4 -> return <| JumpANonZero a
+                  5 -> return <| JumpANonPositive a
                   y -> throwError <| InvalidModification f
         x  -> throwError <| UnrecognizedInstructionCode x
 
@@ -699,6 +713,54 @@ executeInstructionTransition i s =
                else s
         JumpOnLessEqual adr
             -> if (s.comparison == L) || (s.comparison == E)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpANegative adr
+            -> if (wordValue s.a < 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpAZero adr
+            -> if (wordValue s.a == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpAPositive adr
+            -> if (wordValue s.a > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpANonNegative adr
+            -> if (wordValue s.a > 0) || (wordValue s.a == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpANonZero adr
+            -> if (wordValue s.a < 0) || (wordValue s.a > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpANonPositive adr
+            -> if (wordValue s.a < 0) || (wordValue s.a == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
                        | p = adr
