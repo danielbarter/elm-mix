@@ -34,6 +34,7 @@ import Atom exposing ( Base
                      , op
                      , intToWord
                      , intToSmallWord
+                     , comp
                      )
 {-
 
@@ -184,6 +185,7 @@ type Instruction = LoadA Address Masks
                  | DecrementI4 Address
                  | DecrementI5 Address
                  | DecrementI6 Address
+                 | CompareA Address Masks
 
 
 {-
@@ -227,6 +229,7 @@ decodeInstruction (a,f,ms,c) =
         2  -> return <| Sub a ms
         3  -> return <| AddX ms
         4  -> return <| SubX ms
+        56 -> return <| CompareA a ms
         48 -> case f of
                   2 -> return <| EnterA a
                   3 -> return <| EnterANeg a
@@ -569,6 +572,9 @@ executeInstructionTransition i s =
                in { s | i6 = r
                   , overflow = t
                   }
+        CompareA adr masks
+            -> let c = comp masks s.a <| read adr s.mem
+               in { s | comparison = c }
 
 
 

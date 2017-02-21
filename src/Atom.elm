@@ -30,6 +30,7 @@ module Atom exposing ( Base
                      , op
                      , intToWord
                      , intToSmallWord
+                     , comp
                      )
 
 type alias Base = Int
@@ -249,7 +250,21 @@ op op masks a m =
         aValue = wordValue a
         mmValue = wordValue mm
     in intToWord (op aValue mmValue) a
-                
+
+-- when comparing, we mask both the register and the memory location
+comp : Masks -> Word -> Word -> ComparisonIndicator
+comp masks a m =
+    let mm = copy masks m zeroWord
+        aa = copy masks a zeroWord
+        aaValue = wordValue aa
+        mmValue = wordValue mm
+    in if aaValue < mmValue
+       then L
+       else if aaValue == mmValue
+            then E
+            else G
+
+
 map3 : (a1 -> b1) -> (a2 -> b2) -> (a3 -> b3) -> (a1,a2,a3) -> (b1,b2,b3)
 map3 f g h (x,y,z) = (f x, g y, h z)
 
