@@ -221,7 +221,36 @@ type Instruction = LoadA Address Masks
                  | JumpI1NonNegative Address
                  | JumpI1NonZero Address
                  | JumpI1NonPositive Address
-
+                 | JumpI2Negative Address
+                 | JumpI2Zero Address
+                 | JumpI2Positive Address
+                 | JumpI2NonNegative Address
+                 | JumpI2NonZero Address
+                 | JumpI2NonPositive Address
+                 | JumpI3Negative Address
+                 | JumpI3Zero Address
+                 | JumpI3Positive Address
+                 | JumpI3NonNegative Address
+                 | JumpI3NonZero Address
+                 | JumpI3NonPositive Address
+                 | JumpI4Negative Address
+                 | JumpI4Zero Address
+                 | JumpI4Positive Address
+                 | JumpI4NonNegative Address
+                 | JumpI4NonZero Address
+                 | JumpI4NonPositive Address
+                 | JumpI5Negative Address
+                 | JumpI5Zero Address
+                 | JumpI5Positive Address
+                 | JumpI5NonNegative Address
+                 | JumpI5NonZero Address
+                 | JumpI5NonPositive Address
+                 | JumpI6Negative Address
+                 | JumpI6Zero Address
+                 | JumpI6Positive Address
+                 | JumpI6NonNegative Address
+                 | JumpI6NonZero Address
+                 | JumpI6NonPositive Address
 
 {-
 
@@ -355,6 +384,46 @@ decodeInstruction (a,f,ms,c) =
                   3 -> return <| JumpI1NonNegative a
                   4 -> return <| JumpI1NonZero a
                   5 -> return <| JumpI1NonPositive a
+                  y -> throwError <| InvalidModification f
+        42 -> case f of
+                  0 -> return <| JumpI2Negative a
+                  1 -> return <| JumpI2Zero a
+                  2 -> return <| JumpI2Positive a
+                  3 -> return <| JumpI2NonNegative a
+                  4 -> return <| JumpI2NonZero a
+                  5 -> return <| JumpI2NonPositive a
+                  y -> throwError <| InvalidModification f
+        43 -> case f of
+                  0 -> return <| JumpI3Negative a
+                  1 -> return <| JumpI3Zero a
+                  2 -> return <| JumpI3Positive a
+                  3 -> return <| JumpI3NonNegative a
+                  4 -> return <| JumpI3NonZero a
+                  5 -> return <| JumpI3NonPositive a
+                  y -> throwError <| InvalidModification f
+        44 -> case f of
+                  0 -> return <| JumpI4Negative a
+                  1 -> return <| JumpI4Zero a
+                  2 -> return <| JumpI4Positive a
+                  3 -> return <| JumpI4NonNegative a
+                  4 -> return <| JumpI4NonZero a
+                  5 -> return <| JumpI4NonPositive a
+                  y -> throwError <| InvalidModification f
+        45 -> case f of
+                  0 -> return <| JumpI5Negative a
+                  1 -> return <| JumpI5Zero a
+                  2 -> return <| JumpI5Positive a
+                  3 -> return <| JumpI5NonNegative a
+                  4 -> return <| JumpI5NonZero a
+                  5 -> return <| JumpI5NonPositive a
+                  y -> throwError <| InvalidModification f
+        46 -> case f of
+                  0 -> return <| JumpI6Negative a
+                  1 -> return <| JumpI6Zero a
+                  2 -> return <| JumpI6Positive a
+                  3 -> return <| JumpI6NonNegative a
+                  4 -> return <| JumpI6NonZero a
+                  5 -> return <| JumpI6NonPositive a
                   y -> throwError <| InvalidModification f
         x  -> throwError <| UnrecognizedInstructionCode x
 
@@ -885,6 +954,246 @@ executeInstructionTransition i s =
                else s
         JumpI1NonPositive adr
             -> if (smallWordValue s.i1 < 0) || (smallWordValue s.i1 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI2Negative adr
+            -> if (smallWordValue s.i2 < 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI2Zero adr
+            -> if (smallWordValue s.i2 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI2Positive adr
+            -> if (smallWordValue s.i2 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI2NonNegative adr
+            -> if (smallWordValue s.i2 > 0) || (smallWordValue s.i2 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI2NonZero adr
+            -> if (smallWordValue s.i2 < 0) || (smallWordValue s.i2 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI2NonPositive adr
+            -> if (smallWordValue s.i2 < 0) || (smallWordValue s.i2 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI3Negative adr
+            -> if (smallWordValue s.i3 < 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI3Zero adr
+            -> if (smallWordValue s.i3 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI3Positive adr
+            -> if (smallWordValue s.i3 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI3NonNegative adr
+            -> if (smallWordValue s.i3 > 0) || (smallWordValue s.i3 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI3NonZero adr
+            -> if (smallWordValue s.i3 < 0) || (smallWordValue s.i3 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI3NonPositive adr
+            -> if (smallWordValue s.i3 < 0) || (smallWordValue s.i3 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI4Negative adr
+            -> if (smallWordValue s.i4 < 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI4Zero adr
+            -> if (smallWordValue s.i4 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI4Positive adr
+            -> if (smallWordValue s.i4 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI4NonNegative adr
+            -> if (smallWordValue s.i4 > 0) || (smallWordValue s.i4 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI4NonZero adr
+            -> if (smallWordValue s.i4 < 0) || (smallWordValue s.i4 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI4NonPositive adr
+            -> if (smallWordValue s.i4 < 0) || (smallWordValue s.i4 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI5Negative adr
+            -> if (smallWordValue s.i5 < 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI5Zero adr
+            -> if (smallWordValue s.i5 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI5Positive adr
+            -> if (smallWordValue s.i5 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI5NonNegative adr
+            -> if (smallWordValue s.i5 > 0) || (smallWordValue s.i5 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI5NonZero adr
+            -> if (smallWordValue s.i5 < 0) || (smallWordValue s.i5 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI5NonPositive adr
+            -> if (smallWordValue s.i5 < 0) || (smallWordValue s.i5 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI6Negative adr
+            -> if (smallWordValue s.i6 < 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI6Zero adr
+            -> if (smallWordValue s.i6 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI6Positive adr
+            -> if (smallWordValue s.i6 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI6NonNegative adr
+            -> if (smallWordValue s.i6 > 0) || (smallWordValue s.i6 == 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI6NonZero adr
+            -> if (smallWordValue s.i6 < 0) || (smallWordValue s.i6 > 0)
+               then let (t,newJ) = intToSmallWord s.p s.j
+                    in { s
+                       | p = adr
+                       , j = newJ
+                       }
+               else s
+        JumpI6NonPositive adr
+            -> if (smallWordValue s.i6 < 0) || (smallWordValue s.i6 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
                        | p = adr
