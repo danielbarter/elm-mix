@@ -169,6 +169,23 @@ type Instruction = LoadA Address Masks
                  | EnterI5Neg Address
                  | EnterI6Neg Address
                  | IncrementA Address
+                 | IncrementX Address
+                 | IncrementI1 Address
+                 | IncrementI2 Address
+                 | IncrementI3 Address
+                 | IncrementI4 Address
+                 | IncrementI5 Address
+                 | IncrementI6 Address
+                 | DecrementA Address
+                 | DecrementX Address
+                 | DecrementI1 Address
+                 | DecrementI2 Address
+                 | DecrementI3 Address
+                 | DecrementI4 Address
+                 | DecrementI5 Address
+                 | DecrementI6 Address
+
+
 {-
 
 when adding a new instruction, you need to update
@@ -227,6 +244,21 @@ decodeInstruction (a,f,ms,c) =
         (53,3) -> return <| EnterI5Neg a
         (54,3) -> return <| EnterI6Neg a
         (48,0) -> return <| IncrementA a
+        (55,0) -> return <| IncrementX a
+        (49,0) -> return <| IncrementI1 a
+        (50,0) -> return <| IncrementI2 a
+        (51,0) -> return <| IncrementI3 a
+        (52,0) -> return <| IncrementI4 a
+        (53,0) -> return <| IncrementI5 a
+        (54,0) -> return <| IncrementI6 a
+        (48,1) -> return <| DecrementA a
+        (55,1) -> return <| DecrementX a
+        (49,1) -> return <| DecrementI1 a
+        (50,1) -> return <| DecrementI2 a
+        (51,1) -> return <| DecrementI3 a
+        (52,1) -> return <| DecrementI4 a
+        (53,1) -> return <| DecrementI5 a
+        (54,1) -> return <| DecrementI6 a
         x  -> throwError <| UnrecognizedInstructionCode x
 
 
@@ -442,9 +474,84 @@ executeInstructionTransition i s =
                   , overflow = t
                   }
         IncrementA adr
-            -> let (t,r) = intToWord (adr + (wordValue s.a) ) s.a
+            -> let (t,r) = intToWord ( (wordValue s.a) + adr) s.a
                in { s | a = r
-                      , overflow = t
+                  , overflow = t
+                  }
+        IncrementX adr
+            -> let (t,r) = intToWord ( (wordValue s.x) + adr) s.x
+               in { s | x = r
+                  , overflow = t
+                  }
+        IncrementI1 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i1) + adr) s.i1
+               in { s | i1 = r
+                  , overflow = t
+                  }
+        IncrementI2 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i2) + adr) s.i2
+               in { s | i2 = r
+                  , overflow = t
+                  }
+        IncrementI3 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i3) + adr) s.i3
+               in { s | i3 = r
+                  , overflow = t
+                  }
+        IncrementI4 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i4) + adr) s.i4
+               in { s | i4 = r
+                  , overflow = t
+                  }
+        IncrementI5 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i5) + adr) s.i5
+               in { s | i5 = r
+                  , overflow = t
+                  }
+        IncrementI6 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i6) + adr) s.i6
+               in { s | i6 = r
+                  , overflow = t
+                  }
+        DecrementA adr
+            -> let (t,r) = intToWord ( (wordValue s.a) - adr) s.a
+               in { s | a = r
+                  , overflow = t
+                  }
+        DecrementX adr
+            -> let (t,r) = intToWord ( (wordValue s.x) - adr) s.x
+               in { s | x = r
+                  , overflow = t
+                  }
+        DecrementI1 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i1) - adr) s.i1
+               in { s | i1 = r
+                  , overflow = t
+                  }
+        DecrementI2 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i2) - adr) s.i2
+               in { s | i2 = r
+                  , overflow = t
+                  }
+        DecrementI3 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i3) - adr) s.i3
+               in { s | i3 = r
+                  , overflow = t
+                  }
+        DecrementI4 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i4) - adr) s.i4
+               in { s | i4 = r
+                  , overflow = t
+                  }
+        DecrementI5 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i5) - adr) s.i5
+               in { s | i5 = r
+                  , overflow = t
+                  }
+        DecrementI6 adr
+            -> let (t,r) = intToSmallWord ( (smallWordValue s.i6) - adr) s.i6
+               in { s | i6 = r
+                  , overflow = t
                   }
 
 
