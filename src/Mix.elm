@@ -186,6 +186,14 @@ type Instruction = LoadA Address Masks
                  | DecrementI5 Address
                  | DecrementI6 Address
                  | CompareA Address Masks
+                 | CompareX Address Masks
+                 | CompareI1 Address Masks
+                 | CompareI2 Address Masks
+                 | CompareI3 Address Masks
+                 | CompareI4 Address Masks
+                 | CompareI5 Address Masks
+                 | CompareI6 Address Masks
+                 | Jump Address
 
 
 {-
@@ -195,7 +203,7 @@ when adding a new instruction, you need to update
   executeInstructionTransition
 
 -}
---f
+
 decodeInstruction : UnpackedWord -> MixOperation Instruction
 decodeInstruction (a,f,ms,c) =
     case c of
@@ -230,6 +238,13 @@ decodeInstruction (a,f,ms,c) =
         3  -> return <| AddX ms
         4  -> return <| SubX ms
         56 -> return <| CompareA a ms
+        63 -> return <| CompareX a ms
+        57 -> return <| CompareI1 a ms
+        58 -> return <| CompareI2 a ms
+        59 -> return <| CompareI3 a ms
+        60 -> return <| CompareI4 a ms
+        61 -> return <| CompareI5 a ms
+        62 -> return <| CompareI6 a ms
         48 -> case f of
                   2 -> return <| EnterA a
                   3 -> return <| EnterANeg a
@@ -277,6 +292,9 @@ decodeInstruction (a,f,ms,c) =
                   3 -> return <| EnterI6Neg a
                   0 -> return <| IncrementI6 a
                   1 -> return <| DecrementI6 a
+                  y -> throwError <| InvalidModification f
+        39 -> case f of
+                  0 -> return <| Jump a
                   y -> throwError <| InvalidModification f
         x  -> throwError <| UnrecognizedInstructionCode x
 
@@ -575,6 +593,33 @@ executeInstructionTransition i s =
         CompareA adr masks
             -> let c = comp masks s.a <| read adr s.mem
                in { s | comparison = c }
+        CompareX adr masks
+            -> let c = comp masks s.x <| read adr s.mem
+               in { s | comparison = c }
+        CompareI1 adr masks
+            -> let c = comp masks (wordExpand s.i1) <| read adr s.mem
+               in { s | comparison = c }
+        CompareI2 adr masks
+            -> let c = comp masks (wordExpand s.i2) <| read adr s.mem
+               in { s | comparison = c }
+        CompareI3 adr masks
+            -> let c = comp masks (wordExpand s.i3) <| read adr s.mem
+               in { s | comparison = c }
+        CompareI4 adr masks
+            -> let c = comp masks (wordExpand s.i4) <| read adr s.mem
+               in { s | comparison = c }
+        CompareI5 adr masks
+            -> let c = comp masks (wordExpand s.i5) <| read adr s.mem
+               in { s | comparison = c }
+        CompareI6 adr masks
+            -> let c = comp masks (wordExpand s.i6) <| read adr s.mem
+               in { s | comparison = c }
+        Jump adr
+            -> let (t,newJ) = intToSmallWord s.p s.j
+               in { s
+                  | p = adr
+                  , j = newJ
+                  }
 
 
 
