@@ -35,6 +35,8 @@ import Atom exposing ( Base
                      , intToWord
                      , intToSmallWord
                      , comp
+                     , shift
+                     , shiftCircular
                      )
 {-
 
@@ -251,6 +253,18 @@ type Instruction = LoadA Address Masks
                  | JumpI6NonNegative Address
                  | JumpI6NonZero Address
                  | JumpI6NonPositive Address
+                 | ShiftA Address
+                 | ShiftX Address
+                 | ShiftACircular Address
+                 | ShiftXCircular Address
+                 | SwapAX
+                 | MoveXI1
+                 | MoveXI2
+                 | MoveXI3
+                 | MoveXI4
+                 | MoveXI5
+                 | MoveXI6
+                 | NoOperation
 
 {-
 
@@ -263,6 +277,7 @@ when adding a new instruction, you need to update
 decodeInstruction : UnpackedWord -> MixOperation Instruction
 decodeInstruction (a,f,ms,c) =
     case c of
+        0  -> return NoOperation
         8  -> return <| LoadA a ms
         15 -> return <| LoadX a ms
         9  -> return <| LoadI1 a ms
@@ -424,6 +439,21 @@ decodeInstruction (a,f,ms,c) =
                   3 -> return <| JumpI6NonNegative a
                   4 -> return <| JumpI6NonZero a
                   5 -> return <| JumpI6NonPositive a
+                  y -> throwError <| InvalidModification f
+        6  -> case f of
+                  0 -> return <| ShiftA a
+                  1 -> return <| ShiftX a
+                  2 -> return <| ShiftACircular a
+                  3 -> return <| ShiftXCircular a
+                  4 -> return SwapAX
+                  y -> throwError <| InvalidModification f
+        7  -> case f of
+                  0 -> return MoveXI1
+                  1 -> return MoveXI2
+                  2 -> return MoveXI3
+                  3 -> return MoveXI4
+                  4 -> return MoveXI5
+                  5 -> return MoveXI6
                   y -> throwError <| InvalidModification f
         x  -> throwError <| UnrecognizedInstructionCode x
 
@@ -1200,7 +1230,30 @@ executeInstructionTransition i s =
                        , j = newJ
                        }
                else s
-
+        ShiftA adr
+            -> { s | a = shift adr s.a }
+        ShiftX adr
+            -> { s | x = shift adr s.x }
+        ShiftACircular adr
+            -> { s | a = shiftCircular adr s.a }
+        ShiftXCircular adr
+            -> { s | x = shiftCircular adr s.x }
+        SwapAX
+            -> { s | a = s.x , x = s.a }
+        MoveXI1
+            -> { s | i1 = wordContract s.x }
+        MoveXI2
+            -> { s | i2 = wordContract s.x }
+        MoveXI3
+            -> { s | i3 = wordContract s.x }
+        MoveXI4
+            -> { s | i4 = wordContract s.x }
+        MoveXI5
+            -> { s | i5 = wordContract s.x }
+        MoveXI6
+            -> { s | i6 = wordContract s.x }
+        NoOperation
+            -> s
 
 
 

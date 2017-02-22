@@ -31,6 +31,8 @@ module Atom exposing ( Base
                      , intToWord
                      , intToSmallWord
                      , comp
+                     , shift
+                     , shiftCircular
                      )
 
 type alias Base = Int
@@ -264,6 +266,21 @@ comp masks a m =
             then E
             else G
 
+shift : Int -> Word -> Word
+shift n (s,b1,b2,b3,b4,b5) =
+    if n > 0
+    then shift ( n - 1 ) (s,zero,b1,b2,b3,b4)
+    else if n == 0
+         then (s,b1,b2,b3,b4,b5)
+         else shift ( n + 1 ) (s,b2,b3,b4,b5,zero)
+
+shiftCircular : Int -> Word -> Word
+shiftCircular n (s,b1,b2,b3,b4,b5) =
+    if n > 0
+    then shift ( n - 1 ) (s,b5,b1,b2,b3,b4)
+    else if n == 0
+         then (s,b1,b2,b3,b4,b5)
+         else shift ( n + 1 ) (s,b2,b3,b4,b5,b1)
 
 map3 : (a1 -> b1) -> (a2 -> b2) -> (a3 -> b3) -> (a1,a2,a3) -> (b1,b2,b3)
 map3 f g h (x,y,z) = (f x, g y, h z)
