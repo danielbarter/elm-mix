@@ -1,4 +1,13 @@
-module Mix exposing (..)
+module Mix exposing ( Address
+                    , Index
+                    , Modification
+                    , InstructionCode
+                    , Memory
+                    , RuntimeError(..)
+                    , MixOperation
+                    , Instruction(..)
+                    , step
+                    )
 
 import Dict
 
@@ -265,6 +274,7 @@ type Instruction = LoadA Address Masks
                  | MoveXI5
                  | MoveXI6
                  | NoOperation
+                 | Halt
 
 {-
 
@@ -454,6 +464,9 @@ decodeInstruction (a,f,ms,c) =
                   3 -> return MoveXI4
                   4 -> return MoveXI5
                   5 -> return MoveXI6
+                  y -> throwError <| InvalidModification f
+        5  -> case f of
+                  2 -> return Halt
                   y -> throwError <| InvalidModification f
         x  -> throwError <| UnrecognizedInstructionCode x
 
@@ -1254,15 +1267,17 @@ executeInstructionTransition i s =
             -> { s | i6 = wordContract s.x }
         NoOperation
             -> s
+        Halt
+            -> s
 
 
 
-executeInstruction : Instruction -> MixOperation ()
+executeInstruction : Instruction -> MixOperation Instruction
 executeInstruction i =
-    ((executeInstructionTransition i) <$> get) >>= put
+    (((executeInstructionTransition i) <$> get) >>= put) *> (return i)
 
 
-step : MixOperation () 
+step : MixOperation Instruction
 step =
     ((get >>= unpackInstruction) <* incrementCounter)
     >>= decodeInstruction
