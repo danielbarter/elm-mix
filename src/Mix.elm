@@ -3,10 +3,13 @@ module Mix exposing ( Address
                     , Modification
                     , InstructionCode
                     , Memory
+                    , read
+                    , Mix
                     , RuntimeError(..)
                     , MixOperation
                     , Instruction(..)
                     , step
+                    , instruction
                     )
 
 import Dict
@@ -93,11 +96,12 @@ type RuntimeError = NoMemoryValue Address
 type alias MixOperation a = Mix -> Result RuntimeError (Mix,a)
 
 
+
 -- unpack instruction
 type alias UnpackedWord = (Address,Modification,Masks,InstructionCode)
-unpackInstruction : Mix -> MixOperation UnpackedWord
-unpackInstruction m =
-    case Dict.get m.p m.mem of
+unpackInstructionAddress : Mix -> Address -> MixOperation UnpackedWord
+unpackInstructionAddress m a =
+    case Dict.get a m.mem of
         Nothing                 -> throwError <| NoMemoryValue m.p
         Just (s,b1,b2,b3,b4,b5) -> let f v = return
                                              ( (smallWordValue (s,b1,b2) + v)
@@ -116,6 +120,16 @@ unpackInstruction m =
                                           _ -> throwError <| InvalidIndex
                                                           <| value b3
 
+
+unpackInstruction : Mix -> MixOperation UnpackedWord
+unpackInstruction m = unpackInstructionAddress m m.p
+
+instruction : Mix -> Address -> Result Word Instruction
+instruction m a =
+    let p = (unpackInstructionAddress m a) >>= decodeInstruction
+    in case p m of
+           Err err  -> Err <| read a m.mem
+           Ok (s,i) -> Ok i
 
 -- increment program counter
 incrementCounter : MixOperation () 
@@ -469,7 +483,6 @@ decodeInstruction (a,f,ms,c) =
                   2 -> return Halt
                   y -> throwError <| InvalidModification f
         x  -> throwError <| UnrecognizedInstructionCode x
-
 
 
 
