@@ -9,7 +9,6 @@ module Mix exposing ( Address
                     , MixOperation
                     , Instruction(..)
                     , step
-                    , instruction
                     )
 
 import Dict
@@ -124,13 +123,6 @@ unpackInstructionAddress m a =
 unpackInstruction : Mix -> MixOperation UnpackedWord
 unpackInstruction m = unpackInstructionAddress m m.p
 
-instruction : Mix -> Address -> Result Word Instruction
-instruction m a =
-    let p = (unpackInstructionAddress m a) >>= decodeInstruction
-    in case p m of
-           Err err  -> Err <| read a m.mem
-           Ok (s,i) -> Ok i
-
 -- increment program counter
 incrementCounter : MixOperation () 
 incrementCounter =
@@ -144,6 +136,13 @@ design point:
 we are not implementing multiplication and division at a machine level.
 Instead, we have AddX and SubX.
 Multiplication / Division are easily implemented as routines.
+
+-}
+
+{-
+
+The Instruction datatype is only defined at runtime.
+This is because the address is stored post indexing.
 
 -}
 
