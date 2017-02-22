@@ -147,7 +147,7 @@ Multiplication / Division are easily implemented as routines.
 
 -}
 
-
+                                               -- corresponding asm instruction
 type Instruction = LoadA Address Masks         -- LDA i,adr,mask
                  | LoadX Address Masks         -- LDX i,adr,mask
                  | LoadI1 Address Masks        -- LD1 i,adr,mask
