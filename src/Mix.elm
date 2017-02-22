@@ -148,147 +148,147 @@ Multiplication / Division are easily implemented as routines.
 -}
 
 
-type Instruction = LoadA Address Masks
-                 | LoadX Address Masks
-                 | LoadI1 Address Masks
-                 | LoadI2 Address Masks
-                 | LoadI3 Address Masks
-                 | LoadI4 Address Masks
-                 | LoadI5 Address Masks
-                 | LoadI6 Address Masks
-                 | LoadANeg Address Masks
-                 | LoadXNeg Address Masks
-                 | LoadI1Neg Address Masks
-                 | LoadI2Neg Address Masks
-                 | LoadI3Neg Address Masks
-                 | LoadI4Neg Address Masks
-                 | LoadI5Neg Address Masks
-                 | LoadI6Neg Address Masks
-                 | StoreA Address Masks
-                 | StoreX Address Masks
-                 | StoreI1 Address Masks
-                 | StoreI2 Address Masks
-                 | StoreI3 Address Masks
-                 | StoreI4 Address Masks
-                 | StoreI5 Address Masks
-                 | StoreI6 Address Masks
-                 | StoreJ Address Masks
-                 | StoreZero Address Masks
-                 | Add Address Masks
-                 | Sub Address Masks
-                 | AddX Masks
-                 | SubX Masks
-                 | EnterA Address
-                 | EnterX Address
-                 | EnterI1 Address
-                 | EnterI2 Address
-                 | EnterI3 Address
-                 | EnterI4 Address
-                 | EnterI5 Address
-                 | EnterI6 Address
-                 | EnterANeg Address
-                 | EnterXNeg Address
-                 | EnterI1Neg Address
-                 | EnterI2Neg Address
-                 | EnterI3Neg Address
-                 | EnterI4Neg Address
-                 | EnterI5Neg Address
-                 | EnterI6Neg Address
-                 | IncrementA Address
-                 | IncrementX Address
-                 | IncrementI1 Address
-                 | IncrementI2 Address
-                 | IncrementI3 Address
-                 | IncrementI4 Address
-                 | IncrementI5 Address
-                 | IncrementI6 Address
-                 | DecrementA Address
-                 | DecrementX Address
-                 | DecrementI1 Address
-                 | DecrementI2 Address
-                 | DecrementI3 Address
-                 | DecrementI4 Address
-                 | DecrementI5 Address
-                 | DecrementI6 Address
-                 | CompareA Address Masks
-                 | CompareX Address Masks
-                 | CompareI1 Address Masks
-                 | CompareI2 Address Masks
-                 | CompareI3 Address Masks
-                 | CompareI4 Address Masks
-                 | CompareI5 Address Masks
-                 | CompareI6 Address Masks
-                 | Jump Address
-                 | JumpSaveJ Address
-                 | JumpOnOverflow Address
-                 | JumpOnNoOverflow Address
-                 | JumpOnLess Address
-                 | JumpOnEqual Address
-                 | JumpOnGreater Address
-                 | JumpOnGreaterEqual Address
-                 | JumpOnUnEqual Address
-                 | JumpOnLessEqual Address
-                 | JumpANegative Address
-                 | JumpAZero Address
-                 | JumpAPositive Address
-                 | JumpANonNegative Address
-                 | JumpANonZero Address
-                 | JumpANonPositive Address
-                 | JumpXNegative Address
-                 | JumpXZero Address
-                 | JumpXPositive Address
-                 | JumpXNonNegative Address
-                 | JumpXNonZero Address
-                 | JumpXNonPositive Address
-                 | JumpI1Negative Address
-                 | JumpI1Zero Address
-                 | JumpI1Positive Address
-                 | JumpI1NonNegative Address
-                 | JumpI1NonZero Address
-                 | JumpI1NonPositive Address
-                 | JumpI2Negative Address
-                 | JumpI2Zero Address
-                 | JumpI2Positive Address
-                 | JumpI2NonNegative Address
-                 | JumpI2NonZero Address
-                 | JumpI2NonPositive Address
-                 | JumpI3Negative Address
-                 | JumpI3Zero Address
-                 | JumpI3Positive Address
-                 | JumpI3NonNegative Address
-                 | JumpI3NonZero Address
-                 | JumpI3NonPositive Address
-                 | JumpI4Negative Address
-                 | JumpI4Zero Address
-                 | JumpI4Positive Address
-                 | JumpI4NonNegative Address
-                 | JumpI4NonZero Address
-                 | JumpI4NonPositive Address
-                 | JumpI5Negative Address
-                 | JumpI5Zero Address
-                 | JumpI5Positive Address
-                 | JumpI5NonNegative Address
-                 | JumpI5NonZero Address
-                 | JumpI5NonPositive Address
-                 | JumpI6Negative Address
-                 | JumpI6Zero Address
-                 | JumpI6Positive Address
-                 | JumpI6NonNegative Address
-                 | JumpI6NonZero Address
-                 | JumpI6NonPositive Address
-                 | ShiftA Address
-                 | ShiftX Address
-                 | ShiftACircular Address
-                 | ShiftXCircular Address
-                 | SwapAX
-                 | MoveXI1
-                 | MoveXI2
-                 | MoveXI3
-                 | MoveXI4
-                 | MoveXI5
-                 | MoveXI6
-                 | NoOperation
-                 | Halt
+type Instruction = LoadA Address Masks         -- LDA adr,mask
+                 | LoadX Address Masks         -- LDX adr,mask
+                 | LoadI1 Address Masks        -- LD1 adr,mask
+                 | LoadI2 Address Masks        -- LD2 adr,mask
+                 | LoadI3 Address Masks        -- LD3 adr,mask
+                 | LoadI4 Address Masks        -- LD4 adr,mask
+                 | LoadI5 Address Masks        -- LD5 adr,mask
+                 | LoadI6 Address Masks        -- LD6 adr,mask
+                 | LoadANeg Address Masks      -- LDAN adr,mask
+                 | LoadXNeg Address Masks      -- LDXN adr,mask
+                 | LoadI1Neg Address Masks     -- LD1N adr,mask
+                 | LoadI2Neg Address Masks     -- LD2N adr,mask
+                 | LoadI3Neg Address Masks     -- LD3N adr,mask
+                 | LoadI4Neg Address Masks     -- LD4N adr,mask
+                 | LoadI5Neg Address Masks     -- LD5N adr,mask
+                 | LoadI6Neg Address Masks     -- LD6N adr,mask
+                 | StoreA Address Masks        -- STA adr,mask
+                 | StoreX Address Masks        -- STX adr,mask
+                 | StoreI1 Address Masks       -- ST1 adr,mask
+                 | StoreI2 Address Masks       -- ST2 adr,mask     
+                 | StoreI3 Address Masks       -- ST3 adr,mask
+                 | StoreI4 Address Masks       -- ST4 adr,mask
+                 | StoreI5 Address Masks       -- ST5 adr,mask
+                 | StoreI6 Address Masks       -- ST6 adr,mask
+                 | StoreJ Address Masks        -- STJ adr,mask
+                 | StoreZero Address Masks     -- STZ adr,mask
+                 | Add Address Masks           -- ADD adr,mask
+                 | Sub Address Masks           -- SUB adr,mask
+                 | AddX Masks                  -- ADDX adr,mask
+                 | SubX Masks                  -- SUBX adr,mask
+                 | EnterA Address              -- ENTA adr
+                 | EnterX Address              -- ENTX adr
+                 | EnterI1 Address             -- ENT1 adr
+                 | EnterI2 Address             -- ENT2 adr
+                 | EnterI3 Address             -- ENT3 adr
+                 | EnterI4 Address             -- ENT4 adr
+                 | EnterI5 Address             -- ENT5 adr
+                 | EnterI6 Address             -- ENT6 adr
+                 | EnterANeg Address           -- ENNA adr
+                 | EnterXNeg Address           -- ENNX adr
+                 | EnterI1Neg Address          -- ENN1 adr
+                 | EnterI2Neg Address          -- ENN2 adr
+                 | EnterI3Neg Address          -- ENN3 adr
+                 | EnterI4Neg Address          -- ENN4 adr
+                 | EnterI5Neg Address          -- ENN5 adr
+                 | EnterI6Neg Address          -- ENN6 adr
+                 | IncrementA Address          -- INCA adr
+                 | IncrementX Address          -- INCX adr
+                 | IncrementI1 Address         -- INC1 adr
+                 | IncrementI2 Address         -- INC2 adr
+                 | IncrementI3 Address         -- INC3 adr
+                 | IncrementI4 Address         -- INC4 adr
+                 | IncrementI5 Address         -- INC5 adr
+                 | IncrementI6 Address         -- INC6 adr
+                 | DecrementA Address          -- DECA adr
+                 | DecrementX Address          -- DECX adr
+                 | DecrementI1 Address         -- DEC1 adr
+                 | DecrementI2 Address         -- DEC2 adr
+                 | DecrementI3 Address         -- DEC3 adr
+                 | DecrementI4 Address         -- DEC4 adr
+                 | DecrementI5 Address         -- DEC5 adr
+                 | DecrementI6 Address         -- DEC6 adr
+                 | CompareA Address Masks      -- CMPA adr,mask
+                 | CompareX Address Masks      -- CMPX adr,mask
+                 | CompareI1 Address Masks     -- CMP1 adr,mask
+                 | CompareI2 Address Masks     -- CMP2 adr,mask
+                 | CompareI3 Address Masks     -- CMP3 adr,mask
+                 | CompareI4 Address Masks     -- CMP4 adr,mask
+                 | CompareI5 Address Masks     -- CMP5 adr,mask
+                 | CompareI6 Address Masks     -- CMP6 adr,mask
+                 | Jump Address                -- JMP adr
+                 | JumpSaveJ Address           -- JSJ adr
+                 | JumpOnOverflow Address      -- JOV adr
+                 | JumpOnNoOverflow Address    -- JNOV adr
+                 | JumpOnLess Address          -- JL adr
+                 | JumpOnEqual Address         -- JE adr
+                 | JumpOnGreater Address       -- JG adr
+                 | JumpOnGreaterEqual Address  -- JGE adr
+                 | JumpOnUnEqual Address       -- JNE adr
+                 | JumpOnLessEqual Address     -- JLE adr
+                 | JumpANegative Address       -- JAN adr
+                 | JumpAZero Address           -- JAZ adr
+                 | JumpAPositive Address       -- JAP adr
+                 | JumpANonNegative Address    -- JANN adr
+                 | JumpANonZero Address        -- JANZ adr
+                 | JumpANonPositive Address    -- JANP adr
+                 | JumpXNegative Address       -- JXN adr
+                 | JumpXZero Address           -- JXZ adr
+                 | JumpXPositive Address       -- JXP adr
+                 | JumpXNonNegative Address    -- JXNN adr
+                 | JumpXNonZero Address        -- JXNZ adr
+                 | JumpXNonPositive Address    -- JXNP adr
+                 | JumpI1Negative Address      -- J1N adr
+                 | JumpI1Zero Address          -- J1Z adr
+                 | JumpI1Positive Address      -- J1P adr
+                 | JumpI1NonNegative Address   -- J1NN adr
+                 | JumpI1NonZero Address       -- J1NZ adr
+                 | JumpI1NonPositive Address   -- J1NP adr
+                 | JumpI2Negative Address      -- J2N adr 
+                 | JumpI2Zero Address          -- J2Z adr
+                 | JumpI2Positive Address      -- J2P adr
+                 | JumpI2NonNegative Address   -- J2NN adr
+                 | JumpI2NonZero Address       -- J2NZ adr
+                 | JumpI2NonPositive Address   -- J2NP adr
+                 | JumpI3Negative Address      -- J3N adr
+                 | JumpI3Zero Address          -- J3Z adr
+                 | JumpI3Positive Address      -- J3P adr
+                 | JumpI3NonNegative Address   -- J3NN adr
+                 | JumpI3NonZero Address       -- J3NZ adr
+                 | JumpI3NonPositive Address   -- J3NP adr
+                 | JumpI4Negative Address      -- J4N adr
+                 | JumpI4Zero Address          -- J4Z adr
+                 | JumpI4Positive Address      -- J4P adr
+                 | JumpI4NonNegative Address   -- J4NN adr
+                 | JumpI4NonZero Address       -- J4NZ adr
+                 | JumpI4NonPositive Address   -- J4NP adr
+                 | JumpI5Negative Address      -- J5N adr
+                 | JumpI5Zero Address          -- J5Z adr
+                 | JumpI5Positive Address      -- J5P adr
+                 | JumpI5NonNegative Address   -- J5NN adr
+                 | JumpI5NonZero Address       -- J5NZ adr
+                 | JumpI5NonPositive Address   -- J5NP adr
+                 | JumpI6Negative Address      -- J6N adr
+                 | JumpI6Zero Address          -- J6Z adr
+                 | JumpI6Positive Address      -- J6P adr
+                 | JumpI6NonNegative Address   -- J6NN adr
+                 | JumpI6NonZero Address       -- J6NZ adr
+                 | JumpI6NonPositive Address   -- J6NP adr
+                 | ShiftA Address              -- SA adr
+                 | ShiftX Address              -- SX adr
+                 | ShiftACircular Address      -- SAC adr
+                 | ShiftXCircular Address      -- SAX adr
+                 | SwapAX                      -- SWAP
+                 | MoveXI1                     -- MOVX1
+                 | MoveXI2                     -- MOVX2
+                 | MoveXI3                     -- MOVX3
+                 | MoveXI4                     -- MOVX4
+                 | MoveXI5                     -- MOVX5
+                 | MoveXI6                     -- MOVX6
+                 | NoOperation                 -- NOP
+                 | Halt                        -- HLT
 
 {-
 
