@@ -3,6 +3,7 @@ module ASMParser exposing (..)
 import StateMonad exposing (..)
 import Assembler exposing (..)
 import Instructions exposing (..)
+import Atom exposing (..)
 
 import Regex
 
@@ -193,3 +194,23 @@ tokenize s = case getToken s of
                                     Nothing -> []
                                     Just (c,s2) -> tokenize s2
                  Err StringEmpty -> []
+
+
+
+type CompileError = UnexpectedTokenSequence
+
+    
+compileLine : List Token -> Result CompileError Line
+compileLine l =
+    case l of
+        [N n,Comma,I inst,N a,N i]
+            -> Ok (n,ASMInst <| mapInstruction (\() -> (i,a))
+                                               (\() -> byteToMasks <| byte 0)
+                                               inst)
+        [ N n,Comma,N m,I inst,N a,N i]
+            -> Ok (n,ASMInst <| mapInstruction (\() -> (i,a))
+                                               (\() -> byteToMasks <| byte m)
+                                               inst)
+        [N n,Comma,N m]
+            -> Ok (n, ASMLit m)
+        _ -> Err UnexpectedTokenSequence

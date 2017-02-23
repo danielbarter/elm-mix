@@ -1,4 +1,4 @@
-module Assembler exposing ( ASM
+module Assembler exposing ( ASM(..)
                           , Line
                           , disassemble
                           , assemble
