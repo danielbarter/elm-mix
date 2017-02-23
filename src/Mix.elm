@@ -2,13 +2,27 @@ module Mix exposing ( Memory
                     , read
                     , Mix
                     , instructionTransition
+                    , Tag(..)
+                    , MetaData
+                    , MetaMemory
+                    , readMeta
                     )
 
 import Dict
 import Instructions exposing (..)
 import Atom exposing (..)
 
+
+type Tag = Number
+         | Instruction
+
+type alias MetaData = Tag
+
 type alias Memory = Dict.Dict Address Word
+type alias MetaMemory = Dict.Dict Address MetaData
+
+readMeta : Address -> MetaMemory -> MetaData
+readMeta a meta = Maybe.withDefault Number <| Dict.get a meta
 
 -- the default memory value is zeroWord
 
