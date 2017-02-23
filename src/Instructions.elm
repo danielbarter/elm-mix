@@ -35,7 +35,7 @@ type alias StaticInstruction = Instruction (Index,Address)
 type alias DynamicInstruction = Instruction Address
 
 
-type Instruction a = LoadA a Masks         -- LDA 
+type Instruction a = LoadA a Masks         -- n: LDA,adr,i,m
                    | LoadX a Masks         -- LDX 
                    | LoadI1 a Masks        -- LD1 
                    | LoadI2 a Masks        -- LD2 

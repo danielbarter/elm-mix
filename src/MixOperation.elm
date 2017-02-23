@@ -1,4 +1,5 @@
 module MixOperation exposing ( MixOperation
+                             , State
                              , RuntimeError(..)
                              , (>>=)
                              , return
@@ -19,34 +20,36 @@ type RuntimeError = NoMemoryValue Address
                   | InvalidIndex Index
 
 
-type alias MixOperation s a = s -> Result RuntimeError (s,a)
+type alias MixOperation s a = State s RuntimeError a
 
 
--- monad operations
+-- State Monad
 
-(>>=) : MixOperation s a -> (a -> MixOperation s b) -> MixOperation s b
+type alias State s e a = s -> Result e (s,a)
+
+(>>=) : State s e a -> (a -> State s e b) -> State s e b
 (>>=) p f = let q s = case p s of
                           Err err -> Err err
                           Ok (ss,x) -> f x ss
             in q
 
-return : a -> MixOperation s a
+return : a -> State s e a
 return x = let p s = Ok (s,x)
            in p
 
-get : MixOperation s s
+get : State s e s
 get = let p s = Ok (s,s)
       in p
 
-put : s -> MixOperation s ()
+put : s -> State s e ()
 put m = let p s = Ok (m,())
         in p
 
-throwError : RuntimeError -> MixOperation s a
+throwError : e -> State s e a
 throwError err = let p s = Err err
                  in p
 
-(<*>) : MixOperation s (a -> b) -> MixOperation s a -> MixOperation s b
+(<*>) : State s e (a -> b) -> State s e a -> State s e b
 (<*>) p q = let r s = case p s of
                           Err err -> Err err
                           Ok (ss,f) -> case q ss of
@@ -55,19 +58,19 @@ throwError err = let p s = Err err
             in r
 
                 
-(<$>) : ( a -> b ) -> MixOperation s a -> MixOperation s b
+(<$>) : ( a -> b ) -> State s e a -> State s e b
 (<$>) f p = (return f) <*> p
 
 
-map2 : ( a -> b -> c) -> MixOperation s a -> MixOperation s b -> MixOperation s c
+map2 : ( a -> b -> c) -> State s e a -> State s e b -> State s e c
 map2 f p q = ( f <$> p ) <*> q
 
 
-(<*) : MixOperation s a -> MixOperation s b -> MixOperation s a
+(<*) : State s e a -> State s e b -> State s e a
 (<*) p q = let f x y = x
            in map2 f p q
 
-(*>) : MixOperation s a -> MixOperation s b -> MixOperation s b
+(*>) : State s e a -> State s e b -> State s e b
 (*>) p q = let g x y = y
            in map2 g p q
 
