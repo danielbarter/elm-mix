@@ -203,14 +203,14 @@ type CompileError = UnexpectedTokenSequence
 compileLine : List Token -> Result CompileError Line
 compileLine l =
     case l of
-        [N n,Comma,I inst,N a,N i]
+        [N n,Colon,I inst,N a,Comma,N i]
             -> Ok (n,ASMInst <| mapInstruction (\() -> (i,a))
                                                (\() -> byteToMasks <| byte 0)
                                                inst)
-        [ N n,Comma,N m,I inst,N a,N i]
+        [ N n,Colon,N m,I inst,N a,Comma,N i]
             -> Ok (n,ASMInst <| mapInstruction (\() -> (i,a))
                                                (\() -> byteToMasks <| byte m)
                                                inst)
-        [N n,Comma,N m]
+        [N n,Colon,N m]
             -> Ok (n, ASMLit m)
         _ -> Err UnexpectedTokenSequence
