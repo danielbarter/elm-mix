@@ -6,6 +6,7 @@ module Instructions exposing ( Instruction(..)
                              , InstructionCode
                              , Address
                              , decodeInstruction
+                             , encodeInstruction
                              , Index
                              , UnpackedWord
                              , StaticInstruction
@@ -918,3 +919,161 @@ decodeInstruction (a,i,f,ms,c) =
                   2 -> Ok Halt
                   y -> Err <| InvalidModification f
         x  -> Err <| UnrecognizedInstructionCode x
+
+
+packWithMask : (Address,Index) -> Masks -> InstructionCode -> Word
+packWithMask (a,i) ms c = let (t,(s,b1,b2)) = intToSmallWord a zeroSmallWord
+                        in (s,b1,b2,byte 3,masksToByte ms,byte c)
+
+packWithMod : (Address,Index) -> Modification -> InstructionCode -> Word
+packWithMod (a,i) m c = let (t,(s,b1,b2)) = intToSmallWord a zeroSmallWord
+                      in (s,b1,b2,byte 3,byte m,byte c)
+
+
+
+
+encodeInstruction : StaticInstruction -> Word
+encodeInstruction i =
+    case i of
+       LoadA a m -> packWithMask a m 8
+       LoadX a m -> packWithMask a m 15          
+       LoadI1 a m -> packWithMask a m 9          
+       LoadI2 a m -> packWithMask a m 10           
+       LoadI3 a m -> packWithMask a m 11          
+       LoadI4 a m -> packWithMask a m 12          
+       LoadI5 a m -> packWithMask a m 13          
+       LoadI6 a m -> packWithMask a m 14          
+       LoadANeg a m -> packWithMask a m 16          
+       LoadXNeg a m -> packWithMask a m 23        
+       LoadI1Neg a m -> packWithMask a m 17        
+       LoadI2Neg a m -> packWithMask a m 18       
+       LoadI3Neg a m -> packWithMask a m 19       
+       LoadI4Neg a m -> packWithMask a m 20       
+       LoadI5Neg a m -> packWithMask a m 21       
+       LoadI6Neg a m -> packWithMask a m 22       
+       StoreA a m -> packWithMask a m 24       
+       StoreX a m -> packWithMask a m 31          
+       StoreI1 a m -> packWithMask a m 25          
+       StoreI2 a m -> packWithMask a m 26         
+       StoreI3 a m -> packWithMask a m 27         
+       StoreI4 a m -> packWithMask a m 28         
+       StoreI5 a m -> packWithMask a m 29         
+       StoreI6 a m -> packWithMask a m 30         
+       StoreJ a m -> packWithMask a m 32         
+       StoreZero a m -> packWithMask a m 33         
+       Add a m -> packWithMask a m 1       
+       Sub a m -> packWithMask a m 2              
+       AddX m -> packWithMask (0,0) m 3
+       SubX m -> packWithMask (0,0) m 4
+       EnterA a -> packWithMod a 2 48
+       EnterX a -> packWithMod a 2 55          
+       EnterI1 a -> packWithMod a 2 49            
+       EnterI2 a -> packWithMod a 2 50             
+       EnterI3 a -> packWithMod a 2 51             
+       EnterI4 a -> packWithMod a 2 52         
+       EnterI5 a -> packWithMod a 2 53    
+       EnterI6 a -> packWithMod a 2 54         
+       EnterANeg a -> packWithMod a 3 48         
+       EnterXNeg a -> packWithMod a 3 55       
+       EnterI1Neg a -> packWithMod a 3 49       
+       EnterI2Neg a -> packWithMod a 3 50      
+       EnterI3Neg a -> packWithMod a 3 51      
+       EnterI4Neg a -> packWithMod a 3 52      
+       EnterI5Neg a -> packWithMod a 3 53      
+       EnterI6Neg a -> packWithMod a 3 54      
+       IncrementA a -> packWithMod a 0 48      
+       IncrementX a -> packWithMod a 0 55      
+       IncrementI1 a -> packWithMod a 0 49      
+       IncrementI2 a -> packWithMod a 0 50     
+       IncrementI3 a -> packWithMod a 0 51     
+       IncrementI4 a -> packWithMod a 0 52     
+       IncrementI5 a -> packWithMod a 0 53     
+       IncrementI6 a -> packWithMod a 0 54     
+       DecrementA a -> packWithMod a 1 48     
+       DecrementX a -> packWithMod a 1 55      
+       DecrementI1 a -> packWithMod a 1 49      
+       DecrementI2 a -> packWithMod a 1 50     
+       DecrementI3 a -> packWithMod a 1 51     
+       DecrementI4 a -> packWithMod a 1 52     
+       DecrementI5 a -> packWithMod a 1 53     
+       DecrementI6 a -> packWithMod a 1 54     
+       CompareA a m -> packWithMask a m 56          
+       CompareX a m -> packWithMask a m 63        
+       CompareI1 a m -> packWithMask a m 57       
+       CompareI2 a m -> packWithMask a m 58       
+       CompareI3 a m -> packWithMask a m 59       
+       CompareI4 a m -> packWithMask a m 60       
+       CompareI5 a m -> packWithMask a m 61       
+       CompareI6 a m -> packWithMask a m 62       
+       Jump a -> packWithMod a 0 39    
+       JumpSaveJ a -> packWithMod a 1 39           
+       JumpOnOverflow a -> packWithMod a 2 39      
+       JumpOnNoOverflow a -> packWithMod a 3 39  
+       JumpOnLess a -> packWithMod a 4 39
+       JumpOnEqual a -> packWithMod a 5 39      
+       JumpOnGreater a -> packWithMod a 6 39     
+       JumpOnGreaterEqual a -> packWithMod a 7 39  
+       JumpOnUnEqual a -> packWithMod a 8 39
+       JumpOnLessEqual a -> packWithMod a 9 39   
+       JumpANegative a -> packWithMod a 0 40 
+       JumpAZero a -> packWithMod a 1 40   
+       JumpAPositive a -> packWithMod a 2 40
+       JumpANonNegative a -> packWithMod a 3 40   
+       JumpANonZero a -> packWithMod a 4 40
+       JumpANonPositive a -> packWithMod a 5 40    
+       JumpXNegative a -> packWithMod a 0 47
+       JumpXZero a -> packWithMod a 1 47   
+       JumpXPositive a -> packWithMod a 2 47       
+       JumpXNonNegative a -> packWithMod a 3 47   
+       JumpXNonZero a -> packWithMod a 4 47
+       JumpXNonPositive a -> packWithMod a 5 47    
+       JumpI1Negative a -> packWithMod a 0 41
+       JumpI1Zero a -> packWithMod a 1 41  
+       JumpI1Positive a -> packWithMod a 2 41      
+       JumpI1NonNegative a -> packWithMod a 3 41  
+       JumpI1NonZero a -> packWithMod a 4 41
+       JumpI1NonPositive a -> packWithMod a 5 41   
+       JumpI2Negative a -> packWithMod a 0 42
+       JumpI2Zero a -> packWithMod a 1 42  
+       JumpI2Positive a -> packWithMod a 2 42      
+       JumpI2NonNegative a -> packWithMod a 3 42  
+       JumpI2NonZero a -> packWithMod a 4 42
+       JumpI2NonPositive a -> packWithMod a 5 42   
+       JumpI3Negative a -> packWithMod a 0 43
+       JumpI3Zero a -> packWithMod a 1 43  
+       JumpI3Positive a -> packWithMod a 2 43      
+       JumpI3NonNegative a -> packWithMod a 3 43  
+       JumpI3NonZero a -> packWithMod a 4 43
+       JumpI3NonPositive a -> packWithMod a 5 43   
+       JumpI4Negative a -> packWithMod a 0 44
+       JumpI4Zero a -> packWithMod a 1 44  
+       JumpI4Positive a -> packWithMod a 2 44      
+       JumpI4NonNegative a -> packWithMod a 3 44  
+       JumpI4NonZero a -> packWithMod a 4 44
+       JumpI4NonPositive a -> packWithMod a 5 44   
+       JumpI5Negative a -> packWithMod a 0 45
+       JumpI5Zero a -> packWithMod a 1 45  
+       JumpI5Positive a -> packWithMod a 2 45      
+       JumpI5NonNegative a -> packWithMod a 3 45  
+       JumpI5NonZero a -> packWithMod a 4 45
+       JumpI5NonPositive a -> packWithMod a 5 45   
+       JumpI6Negative a -> packWithMod a 0 46
+       JumpI6Zero a -> packWithMod a 1 46  
+       JumpI6Positive a -> packWithMod a 2 46      
+       JumpI6NonNegative a -> packWithMod a 3 46  
+       JumpI6NonZero a -> packWithMod a 4 46
+       JumpI6NonPositive a -> packWithMod a 5 46   
+       ShiftA a -> packWithMod a 0 6
+       ShiftX a -> packWithMod a 1 6           
+       ShiftACircular a -> packWithMod a 2 6       
+       ShiftXCircular a -> packWithMod a 3 6   
+       SwapAX -> packWithMod (0,0) 4 6
+       MoveXI1 -> packWithMod (0,0) 0 7              
+       MoveXI2 -> packWithMod (0,0) 1 7             
+       MoveXI3 -> packWithMod (0,0) 2 7             
+       MoveXI4 -> packWithMod (0,0) 3 7             
+       MoveXI5 -> packWithMod (0,0) 4 7             
+       MoveXI6 -> packWithMod (0,0) 5 7             
+       NoOperation -> packWithMod (0,0) 0 0  
+       Halt        ->  packWithMod (0,0) 2 5
+
