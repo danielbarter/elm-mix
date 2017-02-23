@@ -32,7 +32,7 @@ testLoad =
 testStore : Mix
 testStore =
     let
-        b = masksToByte (On,Off,On,Off,Off,Off)
+        b = masksToByte (Off,Off,Off,Off,Off,Off)
         m = Dict.fromList [ (0,(Pos,byte 20,byte 0,byte 1,b,byte 25))
                           , (1899,(Pos,byte 1,byte 2,byte 3,byte 4,byte 5))
                           ]

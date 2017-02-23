@@ -1,4 +1,4 @@
-module MixStep exposing (..)
+module MixStep exposing (step)
 
 import Mix exposing (..)
 import MixOperation exposing (..)
@@ -57,3 +57,24 @@ relativiseAddress m (i,a) =
         5 -> Ok <| ( smallWordValue m.i5 ) + a
         6 -> Ok <| ( smallWordValue m.i6 ) + a
         x -> Err <| InvalidIndex x
+
+relativiseInstruction : Mix
+                      -> StaticInstruction
+                      -> MixOperation Mix DynamicInstruction
+relativiseInstruction m s =
+    case distributeResult <| mapInstruction (relativiseAddress m) s of
+        Err err -> throwError err
+        Ok d -> return d
+
+-- phase 3
+relativiseInstructionOp : StaticInstruction -> MixOperation Mix DynamicInstruction
+relativiseInstructionOp s = get >>= (flip relativiseInstruction) s
+
+-- phase 4
+executeInstructionOp : DynamicInstruction -> MixOperation Mix DynamicInstruction
+executeInstructionOp d = (((instructionTransition d) <$> get) >>= put) *> return d 
+
+step : MixOperation Mix DynamicInstruction
+step = (decodeInstructionOp <* incrementCounter)
+       >>= relativiseInstructionOp
+       >>= executeInstructionOp
