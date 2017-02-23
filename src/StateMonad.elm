@@ -4,6 +4,7 @@ module StateMonad exposing   ( State
                              , get
                              , put
                              , throwError
+                             , try
                              , (<*>)
                              , (<$>)
                              , map2
@@ -23,6 +24,14 @@ type alias State s e a = s -> Result e (s,a)
                           Ok (ss,x) -> f x ss
             in q
 
+try : State s e a -> State s e a -> State s e a
+try p q =
+    let r s = case p s of
+                  Err err -> q s
+                  Ok (ss,x) -> Ok (ss,x)
+    in r
+                  
+                
 return : a -> State s e a
 return x = let p s = Ok (s,x)
            in p
