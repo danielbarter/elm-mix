@@ -36,7 +36,7 @@ type alias StaticInstruction = Instruction (Index,Address) Masks
 type alias DynamicInstruction = Instruction Address Masks
 type alias InstructionToken = Instruction () ()
 
-type Instruction a b = LoadA a b             -- n: LDA,adr,i,m
+type Instruction a b = LoadA a b             -- LDA
                      | LoadX a b             -- LDX 
                      | LoadI1 a b            -- LD1 
                      | LoadI2 a b            -- LD2 
@@ -176,7 +176,7 @@ type Instruction a b = LoadA a b             -- n: LDA,adr,i,m
                      | MoveXI5               -- MOVX5
                      | MoveXI6               -- MOVX6
                      | NoOperation           -- NOP
-                     | Halt                  -- HLT
+                     | Halt                  -- HLT         
 
 
 distributeResult : Instruction ( Result e a ) b -> Result e ( Instruction a b )
