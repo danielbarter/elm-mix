@@ -1,11 +1,18 @@
 module MixOperation exposing ( MixOperation
-                             , RuntimeError
+                             , RuntimeError(..)
+                             , (>>=)
+                             , return
+                             , get
+                             , put
+                             , throwError
+                             , (<*>)
+                             , (<$>)
+                             , map2
+                             , (<*)
+                             , (*>)
                              )
 
-import Instructions exposing ( CompileTimeError(..)
-                             , Address
-                             , Index
-                             )
+import Instructions exposing (..)
 
 type RuntimeError = NoMemoryValue Address
                   | CompileError CompileTimeError

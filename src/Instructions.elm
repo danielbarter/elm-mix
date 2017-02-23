@@ -1,21 +1,19 @@
 module Instructions exposing ( Instruction(..)
                              , mapInstruction
+                             , unpack
                              , Modification
                              , InstructionCode
                              , Address
+                             , decodeInstruction
                              , Index
                              , UnpackedWord
                              , StaticInstruction
                              , DynamicInstruction
                              , CompileTimeError(..)
+                             , extractAddress
                              )
 
-import Atom exposing ( Masks
-                     , Word
-                     , byteToMasks
-                     , smallWordValue
-                     , value
-                     )
+import Atom exposing (..)
 
 type alias Modification = Int
 type alias InstructionCode = Int
@@ -178,151 +176,295 @@ type Instruction a = LoadA a Masks         -- LDA
                    | Halt                  -- HLT
 
 
+extractAddress : Instruction a -> Maybe a
+extractAddress i =
+    case i of
+       LoadA a m ->      Just a                
+       LoadX a m ->      Just a                 
+       LoadI1 a m ->     Just a               
+       LoadI2 a m ->     Just a               
+       LoadI3 a m ->     Just a               
+       LoadI4 a m ->     Just a               
+       LoadI5 a m ->     Just a               
+       LoadI6 a m ->     Just a               
+       LoadANeg a m ->   Just a             
+       LoadXNeg a m ->   Just a             
+       LoadI1Neg a m ->  Just a            
+       LoadI2Neg a m ->  Just a            
+       LoadI3Neg a m ->  Just a            
+       LoadI4Neg a m ->  Just a            
+       LoadI5Neg a m ->  Just a            
+       LoadI6Neg a m ->  Just a            
+       StoreA a m ->     Just a               
+       StoreX a m ->     Just a               
+       StoreI1 a m ->    Just a              
+       StoreI2 a m ->    Just a              
+       StoreI3 a m ->    Just a              
+       StoreI4 a m ->    Just a              
+       StoreI5 a m ->    Just a              
+       StoreI6 a m ->    Just a              
+       StoreJ a m ->     Just a               
+       StoreZero a m ->  Just a            
+       Add a m ->        Just a                  
+       Sub a m ->        Just a                  
+       AddX m ->         Nothing     
+       SubX m ->         Nothing
+       EnterA a ->       Just a                
+       EnterX a ->       Just a                
+       EnterI1 a ->      Just a               
+       EnterI2 a ->      Just a               
+       EnterI3 a ->      Just a               
+       EnterI4 a ->      Just a               
+       EnterI5 a ->      Just a               
+       EnterI6 a ->      Just a               
+       EnterANeg a ->    Just a             
+       EnterXNeg a ->    Just a             
+       EnterI1Neg a ->   Just a            
+       EnterI2Neg a ->   Just a            
+       EnterI3Neg a ->   Just a            
+       EnterI4Neg a ->   Just a            
+       EnterI5Neg a ->   Just a            
+       EnterI6Neg a ->   Just a            
+       IncrementA a ->   Just a            
+       IncrementX a ->   Just a            
+       IncrementI1 a ->  Just a           
+       IncrementI2 a ->  Just a          
+       IncrementI3 a ->  Just a         
+       IncrementI4 a ->  Just a           
+       IncrementI5 a ->  Just a           
+       IncrementI6 a ->  Just a           
+       DecrementA a ->   Just a            
+       DecrementX a ->   Just a            
+       DecrementI1 a ->  Just a           
+       DecrementI2 a ->  Just a           
+       DecrementI3 a ->  Just a           
+       DecrementI4 a ->  Just a           
+       DecrementI5 a ->  Just a           
+       DecrementI6 a ->  Just a           
+       CompareA a m ->   Just a             
+       CompareX a m ->   Just a             
+       CompareI1 a m ->  Just a            
+       CompareI2 a m ->  Just a            
+       CompareI3 a m ->  Just a            
+       CompareI4 a m ->  Just a            
+       CompareI5 a m ->  Just a            
+       CompareI6 a m ->  Just a            
+       Jump a ->         Just a                  
+       JumpSaveJ a ->    Just a             
+       JumpOnOverflow a ->  Just a        
+       JumpOnNoOverflow a ->  Just a      
+       JumpOnLess a ->   Just a            
+       JumpOnEqual a ->  Just a           
+       JumpOnGreater a -> Just a         
+       JumpOnGreaterEqual a ->  Just a    
+       JumpOnUnEqual a -> Just a         
+       JumpOnLessEqual a -> Just a       
+       JumpANegative a ->  Just a         
+       JumpAZero a -> Just a             
+       JumpAPositive a ->  Just a         
+       JumpANonNegative a -> Just a      
+       JumpANonZero a -> Just a          
+       JumpANonPositive a -> Just a      
+       JumpXNegative a -> Just a         
+       JumpXZero a -> Just a             
+       JumpXPositive a ->  Just a         
+       JumpXNonNegative a -> Just a      
+       JumpXNonZero a ->          Just a          
+       JumpXNonPositive a ->          Just a      
+       JumpI1Negative a ->          Just a        
+       JumpI1Zero a ->          Just a            
+       JumpI1Positive a ->          Just a        
+       JumpI1NonNegative a ->          Just a     
+       JumpI1NonZero a ->          Just a         
+       JumpI1NonPositive a ->          Just a     
+       JumpI2Negative a ->          Just a        
+       JumpI2Zero a ->          Just a            
+       JumpI2Positive a ->          Just a        
+       JumpI2NonNegative a ->          Just a     
+       JumpI2NonZero a ->          Just a         
+       JumpI2NonPositive a ->          Just a     
+       JumpI3Negative a ->          Just a        
+       JumpI3Zero a ->          Just a            
+       JumpI3Positive a ->          Just a        
+       JumpI3NonNegative a ->          Just a     
+       JumpI3NonZero a ->          Just a         
+       JumpI3NonPositive a ->          Just a     
+       JumpI4Negative a ->          Just a        
+       JumpI4Zero a ->          Just a            
+       JumpI4Positive a ->          Just a        
+       JumpI4NonNegative a ->          Just a     
+       JumpI4NonZero a ->          Just a         
+       JumpI4NonPositive a ->          Just a     
+       JumpI5Negative a ->          Just a        
+       JumpI5Zero a ->          Just a            
+       JumpI5Positive a ->          Just a        
+       JumpI5NonNegative a ->          Just a     
+       JumpI5NonZero a ->          Just a         
+       JumpI5NonPositive a ->          Just a     
+       JumpI6Negative a ->          Just a        
+       JumpI6Zero a ->          Just a            
+       JumpI6Positive a ->          Just a        
+       JumpI6NonNegative a ->          Just a     
+       JumpI6NonZero a ->          Just a         
+       JumpI6NonPositive a ->          Just a     
+       ShiftA a ->                Just a                
+       ShiftX a ->                Just a                
+       ShiftACircular a ->                Just a        
+       ShiftXCircular a ->                Just a        
+       SwapAX ->             Nothing
+       MoveXI1 ->            Nothing
+       MoveXI2 ->            Nothing
+       MoveXI3 ->            Nothing
+       MoveXI4 ->            Nothing
+       MoveXI5 ->            Nothing
+       MoveXI6 ->            Nothing
+       NoOperation ->        Nothing
+       Halt        ->               Nothing  
 
 mapInstruction : (a -> b) -> Instruction a -> Instruction b
 mapInstruction f i =
     case i of
-        LoadA a m ->              LoadA ( f a ) m                
-        LoadX a m ->              LoadX ( f a ) m                
-        LoadI1 a m ->             LoadI1 ( f a ) m               
-        LoadI2 a m ->             LoadI2 ( f a ) m               
-        LoadI3 a m ->             LoadI3 ( f a ) m               
-        LoadI4 a m ->             LoadI4 ( f a ) m               
-        LoadI5 a m ->             LoadI5 ( f a ) m               
-        LoadI6 a m ->             LoadI6 ( f a ) m               
-        LoadANeg a m ->           LoadANeg ( f a ) m             
-        LoadXNeg a m ->           LoadXNeg ( f a ) m             
-        LoadI1Neg a m ->          LoadI1Neg ( f a ) m            
-        LoadI2Neg a m ->          LoadI2Neg ( f a ) m            
-        LoadI3Neg a m ->          LoadI3Neg ( f a ) m            
-        LoadI4Neg a m ->          LoadI4Neg ( f a ) m            
-        LoadI5Neg a m ->          LoadI5Neg ( f a ) m            
-        LoadI6Neg a m ->          LoadI6Neg ( f a ) m            
-        StoreA a m ->             StoreA ( f a ) m               
-        StoreX a m ->             StoreX ( f a ) m               
-        StoreI1 a m ->            StoreI1 ( f a ) m              
-        StoreI2 a m ->            StoreI2 ( f a ) m              
-        StoreI3 a m ->            StoreI3 ( f a ) m              
-        StoreI4 a m ->            StoreI4 ( f a ) m              
-        StoreI5 a m ->            StoreI5 ( f a ) m              
-        StoreI6 a m ->            StoreI6 ( f a ) m              
-        StoreJ a m ->             StoreJ ( f a ) m               
-        StoreZero a m ->          StoreZero ( f a ) m            
-        Add a m ->                Add ( f a ) m                  
-        Sub a m ->                Sub ( f a ) m                  
-        AddX m ->                 AddX m                   
-        SubX m ->                 SubX m                   
-        EnterA a ->               EnterA ( f a )                
-        EnterX a ->               EnterX ( f a )                
-        EnterI1 a ->              EnterI1 ( f a )               
-        EnterI2 a ->              EnterI2 ( f a )               
-        EnterI3 a ->              EnterI3 ( f a )               
-        EnterI4 a ->              EnterI4 ( f a )               
-        EnterI5 a ->              EnterI5 ( f a )               
-        EnterI6 a ->              EnterI6 ( f a )               
-        EnterANeg a ->            EnterANeg ( f a )             
-        EnterXNeg a ->            EnterXNeg ( f a )             
-        EnterI1Neg a ->           EnterI1Neg ( f a )            
-        EnterI2Neg a ->           EnterI2Neg ( f a )            
-        EnterI3Neg a ->           EnterI3Neg ( f a )            
-        EnterI4Neg a ->           EnterI4Neg ( f a )            
-        EnterI5Neg a ->           EnterI5Neg ( f a )            
-        EnterI6Neg a ->           EnterI6Neg ( f a )            
-        IncrementA a ->           IncrementA ( f a )            
-        IncrementX a ->           IncrementX ( f a )            
-        IncrementI1 a ->          IncrementI1 ( f a )           
-        IncrementI2 a ->          IncrementI2 ( f a )          
-        IncrementI3 a ->          IncrementI3 ( f a )         
-        IncrementI4 a ->          IncrementI4 ( f a )           
-        IncrementI5 a ->          IncrementI5 ( f a )           
-        IncrementI6 a ->          IncrementI6 ( f a )           
-        DecrementA a ->           DecrementA ( f a )            
-        DecrementX a ->           DecrementX ( f a )            
-        DecrementI1 a ->          DecrementI1 ( f a )           
-        DecrementI2 a ->          DecrementI2 ( f a )           
-        DecrementI3 a ->          DecrementI3 ( f a )           
-        DecrementI4 a ->          DecrementI4 ( f a )           
-        DecrementI5 a ->          DecrementI5 ( f a )           
-        DecrementI6 a ->          DecrementI6 ( f a )           
-        CompareA a m ->           CompareA ( f a ) m             
-        CompareX a m ->           CompareX ( f a ) m             
-        CompareI1 a m ->          CompareI1 ( f a ) m            
-        CompareI2 a m ->          CompareI2 ( f a ) m            
-        CompareI3 a m ->          CompareI3 ( f a ) m            
-        CompareI4 a m ->          CompareI4 ( f a ) m            
-        CompareI5 a m ->          CompareI5 ( f a ) m            
-        CompareI6 a m ->          CompareI6 ( f a ) m            
-        Jump a ->                 Jump ( f a )                  
-        JumpSaveJ a ->            JumpSaveJ ( f a )             
-        JumpOnOverflow a ->       JumpOnOverflow ( f a )        
-        JumpOnNoOverflow a ->     JumpOnNoOverflow ( f a )      
-        JumpOnLess a ->           JumpOnLess ( f a )            
-        JumpOnEqual a ->          JumpOnEqual ( f a )           
-        JumpOnGreater a ->        JumpOnGreater ( f a )         
-        JumpOnGreaterEqual a ->   JumpOnGreaterEqual ( f a )    
-        JumpOnUnEqual a ->        JumpOnUnEqual ( f a )         
-        JumpOnLessEqual a ->      JumpOnLessEqual ( f a )       
-        JumpANegative a ->        JumpANegative ( f a )         
-        JumpAZero a ->            JumpAZero ( f a )             
-        JumpAPositive a ->        JumpAPositive ( f a )         
-        JumpANonNegative a ->     JumpANonNegative ( f a )      
-        JumpANonZero a ->         JumpANonZero ( f a )          
-        JumpANonPositive a ->     JumpANonPositive ( f a )      
-        JumpXNegative a ->        JumpXNegative ( f a )         
-        JumpXZero a ->            JumpXZero ( f a )             
-        JumpXPositive a ->        JumpXPositive ( f a )         
-        JumpXNonNegative a ->     JumpXNonNegative ( f a )      
-        JumpXNonZero a ->         JumpXNonZero ( f a )          
-        JumpXNonPositive a ->     JumpXNonPositive ( f a )      
-        JumpI1Negative a ->       JumpI1Negative ( f a )        
-        JumpI1Zero a ->           JumpI1Zero ( f a )            
-        JumpI1Positive a ->       JumpI1Positive ( f a )        
-        JumpI1NonNegative a ->    JumpI1NonNegative ( f a )     
-        JumpI1NonZero a ->        JumpI1NonZero ( f a )         
-        JumpI1NonPositive a ->    JumpI1NonPositive ( f a )     
-        JumpI2Negative a ->       JumpI2Negative ( f a )        
-        JumpI2Zero a ->           JumpI2Zero ( f a )            
-        JumpI2Positive a ->       JumpI2Positive ( f a )        
-        JumpI2NonNegative a ->    JumpI2NonNegative ( f a )     
-        JumpI2NonZero a ->        JumpI2NonZero ( f a )         
-        JumpI2NonPositive a ->    JumpI2NonPositive ( f a )     
-        JumpI3Negative a ->       JumpI3Negative ( f a )        
-        JumpI3Zero a ->           JumpI3Zero ( f a )            
-        JumpI3Positive a ->       JumpI3Positive ( f a )        
-        JumpI3NonNegative a ->    JumpI3NonNegative ( f a )     
-        JumpI3NonZero a ->        JumpI3NonZero ( f a )         
-        JumpI3NonPositive a ->    JumpI3NonPositive ( f a )     
-        JumpI4Negative a ->       JumpI4Negative ( f a )        
-        JumpI4Zero a ->           JumpI4Zero ( f a )            
-        JumpI4Positive a ->       JumpI4Positive ( f a )        
-        JumpI4NonNegative a ->    JumpI4NonNegative ( f a )     
-        JumpI4NonZero a ->        JumpI4NonZero ( f a )         
-        JumpI4NonPositive a ->    JumpI4NonPositive ( f a )     
-        JumpI5Negative a ->       JumpI5Negative ( f a )        
-        JumpI5Zero a ->           JumpI5Zero ( f a )            
-        JumpI5Positive a ->       JumpI5Positive ( f a )        
-        JumpI5NonNegative a ->    JumpI5NonNegative ( f a )     
-        JumpI5NonZero a ->        JumpI5NonZero ( f a )         
-        JumpI5NonPositive a ->    JumpI5NonPositive ( f a )     
-        JumpI6Negative a ->       JumpI6Negative ( f a )        
-        JumpI6Zero a ->           JumpI6Zero ( f a )            
-        JumpI6Positive a ->       JumpI6Positive ( f a )        
-        JumpI6NonNegative a ->    JumpI6NonNegative ( f a )     
-        JumpI6NonZero a ->        JumpI6NonZero ( f a )         
-        JumpI6NonPositive a ->    JumpI6NonPositive ( f a )     
-        ShiftA a ->               ShiftA ( f a )                
-        ShiftX a ->               ShiftX ( f a )                
-        ShiftACircular a ->       ShiftACircular ( f a )        
-        ShiftXCircular a ->       ShiftXCircular ( f a )        
-        SwapAX ->                 SwapAX                   
-        MoveXI1 ->                MoveXI1                  
-        MoveXI2 ->                MoveXI2                  
-        MoveXI3 ->                MoveXI3                  
-        MoveXI4 ->                MoveXI4                  
-        MoveXI5 ->                MoveXI5                  
-        MoveXI6 ->                MoveXI6                  
-        NoOperation ->            NoOperation              
-        Halt        ->            Halt                     
+       LoadA a m ->               LoadA ( f a ) m                
+       LoadX a m ->               LoadX ( f a ) m                
+       LoadI1 a m ->              LoadI1 ( f a ) m               
+       LoadI2 a m ->              LoadI2 ( f a ) m               
+       LoadI3 a m ->              LoadI3 ( f a ) m               
+       LoadI4 a m ->              LoadI4 ( f a ) m               
+       LoadI5 a m ->              LoadI5 ( f a ) m               
+       LoadI6 a m ->              LoadI6 ( f a ) m               
+       LoadANeg a m ->            LoadANeg ( f a ) m             
+       LoadXNeg a m ->            LoadXNeg ( f a ) m             
+       LoadI1Neg a m ->           LoadI1Neg ( f a ) m            
+       LoadI2Neg a m ->           LoadI2Neg ( f a ) m            
+       LoadI3Neg a m ->           LoadI3Neg ( f a ) m            
+       LoadI4Neg a m ->           LoadI4Neg ( f a ) m            
+       LoadI5Neg a m ->           LoadI5Neg ( f a ) m            
+       LoadI6Neg a m ->           LoadI6Neg ( f a ) m            
+       StoreA a m ->              StoreA ( f a ) m               
+       StoreX a m ->              StoreX ( f a ) m               
+       StoreI1 a m ->             StoreI1 ( f a ) m              
+       StoreI2 a m ->             StoreI2 ( f a ) m              
+       StoreI3 a m ->             StoreI3 ( f a ) m              
+       StoreI4 a m ->             StoreI4 ( f a ) m              
+       StoreI5 a m ->             StoreI5 ( f a ) m              
+       StoreI6 a m ->             StoreI6 ( f a ) m              
+       StoreJ a m ->              StoreJ ( f a ) m               
+       StoreZero a m ->           StoreZero ( f a ) m            
+       Add a m ->                 Add ( f a ) m                  
+       Sub a m ->                 Sub ( f a ) m                  
+       AddX m ->                  AddX m                   
+       SubX m ->                  SubX m                   
+       EnterA a ->                EnterA ( f a )                
+       EnterX a ->                EnterX ( f a )                
+       EnterI1 a ->               EnterI1 ( f a )               
+       EnterI2 a ->               EnterI2 ( f a )               
+       EnterI3 a ->               EnterI3 ( f a )               
+       EnterI4 a ->               EnterI4 ( f a )               
+       EnterI5 a ->               EnterI5 ( f a )               
+       EnterI6 a ->               EnterI6 ( f a )               
+       EnterANeg a ->             EnterANeg ( f a )             
+       EnterXNeg a ->             EnterXNeg ( f a )             
+       EnterI1Neg a ->            EnterI1Neg ( f a )            
+       EnterI2Neg a ->            EnterI2Neg ( f a )            
+       EnterI3Neg a ->            EnterI3Neg ( f a )            
+       EnterI4Neg a ->            EnterI4Neg ( f a )            
+       EnterI5Neg a ->            EnterI5Neg ( f a )            
+       EnterI6Neg a ->            EnterI6Neg ( f a )            
+       IncrementA a ->            IncrementA ( f a )            
+       IncrementX a ->            IncrementX ( f a )            
+       IncrementI1 a ->           IncrementI1 ( f a )           
+       IncrementI2 a ->           IncrementI2 ( f a )          
+       IncrementI3 a ->           IncrementI3 ( f a )         
+       IncrementI4 a ->           IncrementI4 ( f a )           
+       IncrementI5 a ->           IncrementI5 ( f a )           
+       IncrementI6 a ->           IncrementI6 ( f a )           
+       DecrementA a ->            DecrementA ( f a )            
+       DecrementX a ->            DecrementX ( f a )            
+       DecrementI1 a ->           DecrementI1 ( f a )           
+       DecrementI2 a ->           DecrementI2 ( f a )           
+       DecrementI3 a ->           DecrementI3 ( f a )           
+       DecrementI4 a ->           DecrementI4 ( f a )           
+       DecrementI5 a ->           DecrementI5 ( f a )           
+       DecrementI6 a ->           DecrementI6 ( f a )           
+       CompareA a m ->            CompareA ( f a ) m             
+       CompareX a m ->            CompareX ( f a ) m             
+       CompareI1 a m ->           CompareI1 ( f a ) m            
+       CompareI2 a m ->           CompareI2 ( f a ) m            
+       CompareI3 a m ->           CompareI3 ( f a ) m            
+       CompareI4 a m ->           CompareI4 ( f a ) m            
+       CompareI5 a m ->           CompareI5 ( f a ) m            
+       CompareI6 a m ->           CompareI6 ( f a ) m            
+       Jump a ->                  Jump ( f a )                  
+       JumpSaveJ a ->             JumpSaveJ ( f a )             
+       JumpOnOverflow a ->        JumpOnOverflow ( f a )        
+       JumpOnNoOverflow a ->      JumpOnNoOverflow ( f a )      
+       JumpOnLess a ->            JumpOnLess ( f a )            
+       JumpOnEqual a ->           JumpOnEqual ( f a )           
+       JumpOnGreater a ->         JumpOnGreater ( f a )         
+       JumpOnGreaterEqual a ->    JumpOnGreaterEqual ( f a )    
+       JumpOnUnEqual a ->         JumpOnUnEqual ( f a )         
+       JumpOnLessEqual a ->       JumpOnLessEqual ( f a )       
+       JumpANegative a ->         JumpANegative ( f a )         
+       JumpAZero a ->             JumpAZero ( f a )             
+       JumpAPositive a ->         JumpAPositive ( f a )         
+       JumpANonNegative a ->      JumpANonNegative ( f a )      
+       JumpANonZero a ->          JumpANonZero ( f a )          
+       JumpANonPositive a ->      JumpANonPositive ( f a )      
+       JumpXNegative a ->         JumpXNegative ( f a )         
+       JumpXZero a ->             JumpXZero ( f a )             
+       JumpXPositive a ->         JumpXPositive ( f a )         
+       JumpXNonNegative a ->      JumpXNonNegative ( f a )      
+       JumpXNonZero a ->          JumpXNonZero ( f a )          
+       JumpXNonPositive a ->      JumpXNonPositive ( f a )      
+       JumpI1Negative a ->        JumpI1Negative ( f a )        
+       JumpI1Zero a ->            JumpI1Zero ( f a )            
+       JumpI1Positive a ->        JumpI1Positive ( f a )        
+       JumpI1NonNegative a ->     JumpI1NonNegative ( f a )     
+       JumpI1NonZero a ->         JumpI1NonZero ( f a )         
+       JumpI1NonPositive a ->     JumpI1NonPositive ( f a )     
+       JumpI2Negative a ->        JumpI2Negative ( f a )        
+       JumpI2Zero a ->            JumpI2Zero ( f a )            
+       JumpI2Positive a ->        JumpI2Positive ( f a )        
+       JumpI2NonNegative a ->     JumpI2NonNegative ( f a )     
+       JumpI2NonZero a ->         JumpI2NonZero ( f a )         
+       JumpI2NonPositive a ->     JumpI2NonPositive ( f a )     
+       JumpI3Negative a ->        JumpI3Negative ( f a )        
+       JumpI3Zero a ->            JumpI3Zero ( f a )            
+       JumpI3Positive a ->        JumpI3Positive ( f a )        
+       JumpI3NonNegative a ->     JumpI3NonNegative ( f a )     
+       JumpI3NonZero a ->         JumpI3NonZero ( f a )         
+       JumpI3NonPositive a ->     JumpI3NonPositive ( f a )     
+       JumpI4Negative a ->        JumpI4Negative ( f a )        
+       JumpI4Zero a ->            JumpI4Zero ( f a )            
+       JumpI4Positive a ->        JumpI4Positive ( f a )        
+       JumpI4NonNegative a ->     JumpI4NonNegative ( f a )     
+       JumpI4NonZero a ->         JumpI4NonZero ( f a )         
+       JumpI4NonPositive a ->     JumpI4NonPositive ( f a )     
+       JumpI5Negative a ->        JumpI5Negative ( f a )        
+       JumpI5Zero a ->            JumpI5Zero ( f a )            
+       JumpI5Positive a ->        JumpI5Positive ( f a )        
+       JumpI5NonNegative a ->     JumpI5NonNegative ( f a )     
+       JumpI5NonZero a ->         JumpI5NonZero ( f a )         
+       JumpI5NonPositive a ->     JumpI5NonPositive ( f a )     
+       JumpI6Negative a ->        JumpI6Negative ( f a )        
+       JumpI6Zero a ->            JumpI6Zero ( f a )            
+       JumpI6Positive a ->        JumpI6Positive ( f a )        
+       JumpI6NonNegative a ->     JumpI6NonNegative ( f a )     
+       JumpI6NonZero a ->         JumpI6NonZero ( f a )         
+       JumpI6NonPositive a ->     JumpI6NonPositive ( f a )     
+       ShiftA a ->                ShiftA ( f a )                
+       ShiftX a ->                ShiftX ( f a )                
+       ShiftACircular a ->        ShiftACircular ( f a )        
+       ShiftXCircular a ->        ShiftXCircular ( f a )        
+       SwapAX ->                  SwapAX                   
+       MoveXI1 ->                 MoveXI1                  
+       MoveXI2 ->                 MoveXI2                  
+       MoveXI3 ->                 MoveXI3                  
+       MoveXI4 ->                 MoveXI4                  
+       MoveXI5 ->                 MoveXI5                  
+       MoveXI6 ->                 MoveXI6                  
+       NoOperation ->             NoOperation              
+       Halt        ->             Halt                     
 
 
 type CompileTimeError = InvalidModification Modification

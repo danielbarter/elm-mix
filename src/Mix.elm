@@ -5,58 +5,8 @@ module Mix exposing ( Memory
                     )
 
 import Dict
-
-import Instructions exposing ( Instruction(..)
-                             , Address
-                             , DynamicInstruction
-                             , mapInstruction
-                             )
-
-import Atom exposing ( Base
-                     , Sign(..)
-                     , swap
-                     , baseExpand
-                     , baseExpandPad
-                     , baseContract
-                     , mixBase
-                     , Byte
-                     , byte
-                     , zero
-                     , zeroWord
-                     , zeroSmallWord
-                     , value
-                     , SmallWord
-                     , Word
-                     , wordExpand
-                     , wordContract
-                     , Mask(..)
-                     , Masks
-                     , maskFilter
-                     , copy
-                     , wordValue
-                     , smallWordValue
-                     , byteToMasks
-                     , masksToByte
-                     , flipSignWord
-                     , flipSignSmallWord
-                     , OverflowToggle(..)
-                     , ComparisonIndicator(..)
-                     , op
-                     , intToWord
-                     , intToSmallWord
-                     , comp
-                     , shift
-                     , shiftCircular
-                     )
-{-
-
-execution cycle:
-  unpack instruction
-  increment program counter
-  decode instruction
-  execute instruction
-
--}
+import Instructions exposing (..)
+import Atom exposing (..)
 
 
 

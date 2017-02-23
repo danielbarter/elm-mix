@@ -1,49 +1,7 @@
 module TestMixStates exposing (..)
 
-import Mix exposing  ( Memory
-                     , read
-                     , Mix
-                     , instructionTransition
-                     )
-
-
-import Atom exposing ( Base
-                     , Sign(..)
-                     , swap
-                     , baseExpand
-                     , baseExpandPad
-                     , baseContract
-                     , mixBase
-                     , Byte
-                     , byte
-                     , zero
-                     , zeroWord
-                     , zeroSmallWord
-                     , value
-                     , SmallWord
-                     , Word
-                     , wordExpand
-                     , wordContract
-                     , Mask(..)
-                     , Masks
-                     , maskFilter
-                     , copy
-                     , wordValue
-                     , smallWordValue
-                     , byteToMasks
-                     , masksToByte
-                     , flipSignWord
-                     , flipSignSmallWord
-                     , OverflowToggle(..)
-                     , ComparisonIndicator(..)
-                     , op
-                     , intToWord
-                     , intToSmallWord
-                     , comp
-                     , shift
-                     , shiftCircular
-                     )
-
+import Mix exposing (..)
+import Atom exposing (..)
 import Dict
 
 
