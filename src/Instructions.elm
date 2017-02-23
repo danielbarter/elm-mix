@@ -175,142 +175,142 @@ type Instruction a = LoadA a Masks         -- LDA
                    | NoOperation           -- NOP
                    | Halt                  -- HLT
 
-
-extractAddress : Instruction a -> Maybe a
-extractAddress i =
+{-
+distributeResult : Instruction ( Result e a ) -> Result e ( Instruction a )
+distributeResult i =
     case i of
-       LoadA a m ->      Just a                
-       LoadX a m ->      Just a                 
-       LoadI1 a m ->     Just a               
-       LoadI2 a m ->     Just a               
-       LoadI3 a m ->     Just a               
-       LoadI4 a m ->     Just a               
-       LoadI5 a m ->     Just a               
-       LoadI6 a m ->     Just a               
-       LoadANeg a m ->   Just a             
-       LoadXNeg a m ->   Just a             
-       LoadI1Neg a m ->  Just a            
-       LoadI2Neg a m ->  Just a            
-       LoadI3Neg a m ->  Just a            
-       LoadI4Neg a m ->  Just a            
-       LoadI5Neg a m ->  Just a            
-       LoadI6Neg a m ->  Just a            
-       StoreA a m ->     Just a               
-       StoreX a m ->     Just a               
-       StoreI1 a m ->    Just a              
-       StoreI2 a m ->    Just a              
-       StoreI3 a m ->    Just a              
-       StoreI4 a m ->    Just a              
-       StoreI5 a m ->    Just a              
-       StoreI6 a m ->    Just a              
-       StoreJ a m ->     Just a               
-       StoreZero a m ->  Just a            
-       Add a m ->        Just a                  
-       Sub a m ->        Just a                  
+       LoadA r m ->      Just r                
+       LoadX r m ->      Just r                 
+       LoadI1 r m ->     Just r               
+       LoadI2 r m ->     Just r               
+       LoadI3 r m ->     Just r               
+       LoadI4 r m ->     Just r               
+       LoadI5 r m ->     Just r               
+       LoadI6 r m ->     Just r               
+       LoadANeg r m ->   Just r             
+       LoadXNeg r m ->   Just r             
+       LoadI1Neg r m ->  Just r            
+       LoadI2Neg r m ->  Just r            
+       LoadI3Neg r m ->  Just r            
+       LoadI4Neg r m ->  Just r            
+       LoadI5Neg r m ->  Just r            
+       LoadI6Neg r m ->  Just r            
+       StoreA r m ->     Just r               
+       StoreX r m ->     Just r               
+       StoreI1 r m ->    Just r              
+       StoreI2 r m ->    Just r              
+       StoreI3 r m ->    Just r              
+       StoreI4 r m ->    Just r              
+       StoreI5 r m ->    Just r              
+       StoreI6 r m ->    Just r              
+       StoreJ r m ->     Just r               
+       StoreZero r m ->  Just r            
+       Add r m ->        Just r                  
+       Sub r m ->        Just r                  
        AddX m ->         Nothing     
        SubX m ->         Nothing
-       EnterA a ->       Just a                
-       EnterX a ->       Just a                
-       EnterI1 a ->      Just a               
-       EnterI2 a ->      Just a               
-       EnterI3 a ->      Just a               
-       EnterI4 a ->      Just a               
-       EnterI5 a ->      Just a               
-       EnterI6 a ->      Just a               
-       EnterANeg a ->    Just a             
-       EnterXNeg a ->    Just a             
-       EnterI1Neg a ->   Just a            
-       EnterI2Neg a ->   Just a            
-       EnterI3Neg a ->   Just a            
-       EnterI4Neg a ->   Just a            
-       EnterI5Neg a ->   Just a            
-       EnterI6Neg a ->   Just a            
-       IncrementA a ->   Just a            
-       IncrementX a ->   Just a            
-       IncrementI1 a ->  Just a           
-       IncrementI2 a ->  Just a          
-       IncrementI3 a ->  Just a         
-       IncrementI4 a ->  Just a           
-       IncrementI5 a ->  Just a           
-       IncrementI6 a ->  Just a           
-       DecrementA a ->   Just a            
-       DecrementX a ->   Just a            
-       DecrementI1 a ->  Just a           
-       DecrementI2 a ->  Just a           
-       DecrementI3 a ->  Just a           
-       DecrementI4 a ->  Just a           
-       DecrementI5 a ->  Just a           
-       DecrementI6 a ->  Just a           
-       CompareA a m ->   Just a             
-       CompareX a m ->   Just a             
-       CompareI1 a m ->  Just a            
-       CompareI2 a m ->  Just a            
-       CompareI3 a m ->  Just a            
-       CompareI4 a m ->  Just a            
-       CompareI5 a m ->  Just a            
-       CompareI6 a m ->  Just a            
-       Jump a ->         Just a                  
-       JumpSaveJ a ->    Just a             
-       JumpOnOverflow a ->  Just a        
-       JumpOnNoOverflow a ->  Just a      
-       JumpOnLess a ->   Just a            
-       JumpOnEqual a ->  Just a           
-       JumpOnGreater a -> Just a         
-       JumpOnGreaterEqual a ->  Just a    
-       JumpOnUnEqual a -> Just a         
-       JumpOnLessEqual a -> Just a       
-       JumpANegative a ->  Just a         
-       JumpAZero a -> Just a             
-       JumpAPositive a ->  Just a         
-       JumpANonNegative a -> Just a      
-       JumpANonZero a -> Just a          
-       JumpANonPositive a -> Just a      
-       JumpXNegative a -> Just a         
-       JumpXZero a -> Just a             
-       JumpXPositive a ->  Just a         
-       JumpXNonNegative a -> Just a      
-       JumpXNonZero a ->          Just a          
-       JumpXNonPositive a ->          Just a      
-       JumpI1Negative a ->          Just a        
-       JumpI1Zero a ->          Just a            
-       JumpI1Positive a ->          Just a        
-       JumpI1NonNegative a ->          Just a     
-       JumpI1NonZero a ->          Just a         
-       JumpI1NonPositive a ->          Just a     
-       JumpI2Negative a ->          Just a        
-       JumpI2Zero a ->          Just a            
-       JumpI2Positive a ->          Just a        
-       JumpI2NonNegative a ->          Just a     
-       JumpI2NonZero a ->          Just a         
-       JumpI2NonPositive a ->          Just a     
-       JumpI3Negative a ->          Just a        
-       JumpI3Zero a ->          Just a            
-       JumpI3Positive a ->          Just a        
-       JumpI3NonNegative a ->          Just a     
-       JumpI3NonZero a ->          Just a         
-       JumpI3NonPositive a ->          Just a     
-       JumpI4Negative a ->          Just a        
-       JumpI4Zero a ->          Just a            
-       JumpI4Positive a ->          Just a        
-       JumpI4NonNegative a ->          Just a     
-       JumpI4NonZero a ->          Just a         
-       JumpI4NonPositive a ->          Just a     
-       JumpI5Negative a ->          Just a        
-       JumpI5Zero a ->          Just a            
-       JumpI5Positive a ->          Just a        
-       JumpI5NonNegative a ->          Just a     
-       JumpI5NonZero a ->          Just a         
-       JumpI5NonPositive a ->          Just a     
-       JumpI6Negative a ->          Just a        
-       JumpI6Zero a ->          Just a            
-       JumpI6Positive a ->          Just a        
-       JumpI6NonNegative a ->          Just a     
-       JumpI6NonZero a ->          Just a         
-       JumpI6NonPositive a ->          Just a     
-       ShiftA a ->                Just a                
-       ShiftX a ->                Just a                
-       ShiftACircular a ->                Just a        
-       ShiftXCircular a ->                Just a        
+       EnterA r ->       Just r                
+       EnterX r ->       Just r                
+       EnterI1 r ->      Just r               
+       EnterI2 r ->      Just r               
+       EnterI3 r ->      Just r               
+       EnterI4 r ->      Just r               
+       EnterI5 r ->      Just r               
+       EnterI6 r ->      Just r               
+       EnterANeg r ->    Just r             
+       EnterXNeg r ->    Just r             
+       EnterI1Neg r ->   Just r            
+       EnterI2Neg r ->   Just r            
+       EnterI3Neg r ->   Just r            
+       EnterI4Neg r ->   Just r            
+       EnterI5Neg r ->   Just r            
+       EnterI6Neg r ->   Just r            
+       IncrementA r ->   Just r            
+       IncrementX r ->   Just r            
+       IncrementI1 r ->  Just r           
+       IncrementI2 r ->  Just r          
+       IncrementI3 r ->  Just r         
+       IncrementI4 r ->  Just r           
+       IncrementI5 r ->  Just r           
+       IncrementI6 r ->  Just r           
+       DecrementA r ->   Just r            
+       DecrementX r ->   Just r            
+       DecrementI1 r ->  Just r           
+       DecrementI2 r ->  Just r           
+       DecrementI3 r ->  Just r           
+       DecrementI4 r ->  Just r           
+       DecrementI5 r ->  Just r           
+       DecrementI6 r ->  Just r           
+       CompareA r m ->   Just r             
+       CompareX r m ->   Just r             
+       CompareI1 r m ->  Just r            
+       CompareI2 r m ->  Just r            
+       CompareI3 r m ->  Just r            
+       CompareI4 r m ->  Just r            
+       CompareI5 r m ->  Just r            
+       CompareI6 r m ->  Just r            
+       Jump r ->         Just r                  
+       JumpSaveJ r ->    Just r             
+       JumpOnOverflow r ->      Just r        
+       JumpOnNoOverflow r ->    Just r      
+       JumpOnLess r ->          Just r            
+       JumpOnEqual r ->         Just r           
+       JumpOnGreater r ->       Just r         
+       JumpOnGreaterEqual r ->  Just r    
+       JumpOnUnEqual r ->       Just r         
+       JumpOnLessEqual r ->     Just r       
+       JumpANegative r ->       Just r         
+       JumpAZero r ->           Just r             
+       JumpAPositive r ->       Just r         
+       JumpANonNegative r ->    Just r      
+       JumpANonZero r ->        Just r          
+       JumpANonPositive r ->    Just r      
+       JumpXNegative r ->       Just r         
+       JumpXZero r ->           Just r             
+       JumpXPositive r ->       Just r         
+       JumpXNonNegative r ->    Just r      
+       JumpXNonZero r ->        Just r          
+       JumpXNonPositive r ->    Just r      
+       JumpI1Negative r ->      Just r        
+       JumpI1Zero r ->          Just r            
+       JumpI1Positive r ->      Just r        
+       JumpI1NonNegative r ->   Just r     
+       JumpI1NonZero r ->       Just r         
+       JumpI1NonPositive r ->   Just r     
+       JumpI2Negative r ->      Just r        
+       JumpI2Zero r ->          Just r            
+       JumpI2Positive r ->      Just r        
+       JumpI2NonNegative r ->   Just r     
+       JumpI2NonZero r ->       Just r         
+       JumpI2NonPositive r ->   Just r     
+       JumpI3Negative r ->      Just r        
+       JumpI3Zero r ->          Just r            
+       JumpI3Positive r ->      Just r        
+       JumpI3NonNegative r ->   Just r     
+       JumpI3NonZero r ->       Just r         
+       JumpI3NonPositive r ->   Just r     
+       JumpI4Negative r ->      Just r        
+       JumpI4Zero r ->          Just r            
+       JumpI4Positive r ->      Just r        
+       JumpI4NonNegative r ->   Just r     
+       JumpI4NonZero r ->       Just r         
+       JumpI4NonPositive r ->   Just r     
+       JumpI5Negative r ->      Just r        
+       JumpI5Zero r ->          Just r            
+       JumpI5Positive r ->      Just r        
+       JumpI5NonNegative r ->   Just r     
+       JumpI5NonZero r ->       Just r         
+       JumpI5NonPositive r ->   Just r     
+       JumpI6Negative r ->      Just r        
+       JumpI6Zero r ->          Just r            
+       JumpI6Positive r ->      Just r        
+       JumpI6NonNegative r ->   Just r     
+       JumpI6NonZero r ->       Just r         
+       JumpI6NonPositive r ->   Just r     
+       ShiftA r ->              Just r                
+       ShiftX r ->              Just r                
+       ShiftACircular r ->      Just r        
+       ShiftXCircular r ->      Just r        
        SwapAX ->             Nothing
        MoveXI1 ->            Nothing
        MoveXI2 ->            Nothing
@@ -319,7 +319,9 @@ extractAddress i =
        MoveXI5 ->            Nothing
        MoveXI6 ->            Nothing
        NoOperation ->        Nothing
-       Halt        ->               Nothing  
+       Halt        ->        Nothing  
+-}
+
 
 mapInstruction : (a -> b) -> Instruction a -> Instruction b
 mapInstruction f i =
