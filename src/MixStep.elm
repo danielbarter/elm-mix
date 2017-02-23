@@ -1,7 +1,10 @@
-module MixStep exposing (step)
+module MixStep exposing ( step
+                        , RuntimeError
+                        , MixOperation
+                        )
 
 import Mix exposing (..)
-import MixOperation exposing (..)
+import StateMonad exposing (..)
 import Atom exposing (..)
 import Instructions exposing (..)
 import Dict
@@ -17,30 +20,39 @@ execution cycle:
 -}
 
 
-nextWord : Mix -> MixOperation Mix Word
+type RuntimeError = NoMemoryValue Address
+                  | CompileError CompileTimeError
+                  | InvalidIndex Index
+
+
+type alias MixOperation a = State Mix RuntimeError a
+
+
+
+nextWord : Mix -> MixOperation Word
 nextWord m =
     case Dict.get m.p m.mem of
         Nothing -> throwError <| NoMemoryValue m.p
         Just w  -> return w
 
 
-unpackOp : Word -> MixOperation Mix UnpackedWord
+unpackOp : Word -> MixOperation UnpackedWord
 unpackOp w = return <| unpack w
 
-decodeOp : UnpackedWord -> MixOperation Mix StaticInstruction
+decodeOp : UnpackedWord -> MixOperation StaticInstruction
 decodeOp u =
     case decodeInstruction u of
         Err err -> throwError <| CompileError err
         Ok s -> return s
 
 -- phase 1
-decodeInstructionOp : MixOperation Mix StaticInstruction
+decodeInstructionOp : MixOperation StaticInstruction
 decodeInstructionOp =
     get >>= nextWord >>= unpackOp >>= decodeOp
 
 
 -- phase 2
-incrementCounter : MixOperation Mix () 
+incrementCounter : MixOperation () 
 incrementCounter =
     let op m = { m | p = m.p + 1 }
     in (op <$> get) >>= put 
@@ -60,21 +72,21 @@ relativiseAddress m (i,a) =
 
 relativiseInstruction : Mix
                       -> StaticInstruction
-                      -> MixOperation Mix DynamicInstruction
+                      -> MixOperation DynamicInstruction
 relativiseInstruction m s =
     case distributeResult <| mapInstruction (relativiseAddress m) s of
         Err err -> throwError err
         Ok d -> return d
 
 -- phase 3
-relativiseInstructionOp : StaticInstruction -> MixOperation Mix DynamicInstruction
+relativiseInstructionOp : StaticInstruction -> MixOperation DynamicInstruction
 relativiseInstructionOp s = get >>= (flip relativiseInstruction) s
 
 -- phase 4
-executeInstructionOp : DynamicInstruction -> MixOperation Mix DynamicInstruction
+executeInstructionOp : DynamicInstruction -> MixOperation DynamicInstruction
 executeInstructionOp d = (((instructionTransition d) <$> get) >>= put) *> return d 
 
-step : MixOperation Mix DynamicInstruction
+step : MixOperation DynamicInstruction
 step = (decodeInstructionOp <* incrementCounter)
        >>= relativiseInstructionOp
        >>= executeInstructionOp

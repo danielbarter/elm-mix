@@ -1,6 +1,4 @@
-module MixOperation exposing ( MixOperation
-                             , State
-                             , RuntimeError(..)
+module StateMonad exposing   ( State
                              , (>>=)
                              , return
                              , get
@@ -13,17 +11,9 @@ module MixOperation exposing ( MixOperation
                              , (*>)
                              )
 
-import Instructions exposing (..)
-
-type RuntimeError = NoMemoryValue Address
-                  | CompileError CompileTimeError
-                  | InvalidIndex Index
 
 
-type alias MixOperation s a = State s RuntimeError a
-
-
--- State Monad
+-- State Monad which fails upon error
 
 type alias State s e a = s -> Result e (s,a)
 
