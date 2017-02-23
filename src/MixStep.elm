@@ -74,7 +74,7 @@ relativiseInstruction : Mix
                       -> StaticInstruction
                       -> MixOperation DynamicInstruction
 relativiseInstruction m s =
-    case distributeResult <| mapInstruction (relativiseAddress m) s of
+    case distributeResult <| mapInstruction (relativiseAddress m) identity s of
         Err err -> throwError err
         Ok d -> return d
 
