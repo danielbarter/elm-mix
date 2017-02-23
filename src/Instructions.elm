@@ -10,7 +10,6 @@ module Instructions exposing ( Instruction(..)
                              , StaticInstruction
                              , DynamicInstruction
                              , CompileTimeError(..)
-                             , extractAddress
                              )
 
 import Atom exposing (..)
