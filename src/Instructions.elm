@@ -1,5 +1,6 @@
 module Instructions exposing ( Instruction(..)
                              , mapInstruction
+                             , distributeResult
                              , unpack
                              , Modification
                              , InstructionCode
@@ -174,152 +175,412 @@ type Instruction a = LoadA a Masks         -- LDA
                    | NoOperation           -- NOP
                    | Halt                  -- HLT
 
-{-
+
 distributeResult : Instruction ( Result e a ) -> Result e ( Instruction a )
 distributeResult i =
     case i of
-       LoadA r m ->      Just r                
-       LoadX r m ->      Just r                 
-       LoadI1 r m ->     Just r               
-       LoadI2 r m ->     Just r               
-       LoadI3 r m ->     Just r               
-       LoadI4 r m ->     Just r               
-       LoadI5 r m ->     Just r               
-       LoadI6 r m ->     Just r               
-       LoadANeg r m ->   Just r             
-       LoadXNeg r m ->   Just r             
-       LoadI1Neg r m ->  Just r            
-       LoadI2Neg r m ->  Just r            
-       LoadI3Neg r m ->  Just r            
-       LoadI4Neg r m ->  Just r            
-       LoadI5Neg r m ->  Just r            
-       LoadI6Neg r m ->  Just r            
-       StoreA r m ->     Just r               
-       StoreX r m ->     Just r               
-       StoreI1 r m ->    Just r              
-       StoreI2 r m ->    Just r              
-       StoreI3 r m ->    Just r              
-       StoreI4 r m ->    Just r              
-       StoreI5 r m ->    Just r              
-       StoreI6 r m ->    Just r              
-       StoreJ r m ->     Just r               
-       StoreZero r m ->  Just r            
-       Add r m ->        Just r                  
-       Sub r m ->        Just r                  
-       AddX m ->         Nothing     
-       SubX m ->         Nothing
-       EnterA r ->       Just r                
-       EnterX r ->       Just r                
-       EnterI1 r ->      Just r               
-       EnterI2 r ->      Just r               
-       EnterI3 r ->      Just r               
-       EnterI4 r ->      Just r               
-       EnterI5 r ->      Just r               
-       EnterI6 r ->      Just r               
-       EnterANeg r ->    Just r             
-       EnterXNeg r ->    Just r             
-       EnterI1Neg r ->   Just r            
-       EnterI2Neg r ->   Just r            
-       EnterI3Neg r ->   Just r            
-       EnterI4Neg r ->   Just r            
-       EnterI5Neg r ->   Just r            
-       EnterI6Neg r ->   Just r            
-       IncrementA r ->   Just r            
-       IncrementX r ->   Just r            
-       IncrementI1 r ->  Just r           
-       IncrementI2 r ->  Just r          
-       IncrementI3 r ->  Just r         
-       IncrementI4 r ->  Just r           
-       IncrementI5 r ->  Just r           
-       IncrementI6 r ->  Just r           
-       DecrementA r ->   Just r            
-       DecrementX r ->   Just r            
-       DecrementI1 r ->  Just r           
-       DecrementI2 r ->  Just r           
-       DecrementI3 r ->  Just r           
-       DecrementI4 r ->  Just r           
-       DecrementI5 r ->  Just r           
-       DecrementI6 r ->  Just r           
-       CompareA r m ->   Just r             
-       CompareX r m ->   Just r             
-       CompareI1 r m ->  Just r            
-       CompareI2 r m ->  Just r            
-       CompareI3 r m ->  Just r            
-       CompareI4 r m ->  Just r            
-       CompareI5 r m ->  Just r            
-       CompareI6 r m ->  Just r            
-       Jump r ->         Just r                  
-       JumpSaveJ r ->    Just r             
-       JumpOnOverflow r ->      Just r        
-       JumpOnNoOverflow r ->    Just r      
-       JumpOnLess r ->          Just r            
-       JumpOnEqual r ->         Just r           
-       JumpOnGreater r ->       Just r         
-       JumpOnGreaterEqual r ->  Just r    
-       JumpOnUnEqual r ->       Just r         
-       JumpOnLessEqual r ->     Just r       
-       JumpANegative r ->       Just r         
-       JumpAZero r ->           Just r             
-       JumpAPositive r ->       Just r         
-       JumpANonNegative r ->    Just r      
-       JumpANonZero r ->        Just r          
-       JumpANonPositive r ->    Just r      
-       JumpXNegative r ->       Just r         
-       JumpXZero r ->           Just r             
-       JumpXPositive r ->       Just r         
-       JumpXNonNegative r ->    Just r      
-       JumpXNonZero r ->        Just r          
-       JumpXNonPositive r ->    Just r      
-       JumpI1Negative r ->      Just r        
-       JumpI1Zero r ->          Just r            
-       JumpI1Positive r ->      Just r        
-       JumpI1NonNegative r ->   Just r     
-       JumpI1NonZero r ->       Just r         
-       JumpI1NonPositive r ->   Just r     
-       JumpI2Negative r ->      Just r        
-       JumpI2Zero r ->          Just r            
-       JumpI2Positive r ->      Just r        
-       JumpI2NonNegative r ->   Just r     
-       JumpI2NonZero r ->       Just r         
-       JumpI2NonPositive r ->   Just r     
-       JumpI3Negative r ->      Just r        
-       JumpI3Zero r ->          Just r            
-       JumpI3Positive r ->      Just r        
-       JumpI3NonNegative r ->   Just r     
-       JumpI3NonZero r ->       Just r         
-       JumpI3NonPositive r ->   Just r     
-       JumpI4Negative r ->      Just r        
-       JumpI4Zero r ->          Just r            
-       JumpI4Positive r ->      Just r        
-       JumpI4NonNegative r ->   Just r     
-       JumpI4NonZero r ->       Just r         
-       JumpI4NonPositive r ->   Just r     
-       JumpI5Negative r ->      Just r        
-       JumpI5Zero r ->          Just r            
-       JumpI5Positive r ->      Just r        
-       JumpI5NonNegative r ->   Just r     
-       JumpI5NonZero r ->       Just r         
-       JumpI5NonPositive r ->   Just r     
-       JumpI6Negative r ->      Just r        
-       JumpI6Zero r ->          Just r            
-       JumpI6Positive r ->      Just r        
-       JumpI6NonNegative r ->   Just r     
-       JumpI6NonZero r ->       Just r         
-       JumpI6NonPositive r ->   Just r     
-       ShiftA r ->              Just r                
-       ShiftX r ->              Just r                
-       ShiftACircular r ->      Just r        
-       ShiftXCircular r ->      Just r        
-       SwapAX ->             Nothing
-       MoveXI1 ->            Nothing
-       MoveXI2 ->            Nothing
-       MoveXI3 ->            Nothing
-       MoveXI4 ->            Nothing
-       MoveXI5 ->            Nothing
-       MoveXI6 ->            Nothing
-       NoOperation ->        Nothing
-       Halt        ->        Nothing  
--}
+       LoadA r m ->      case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| LoadA x m
+       LoadX r m ->      case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| LoadX x m                 
+       LoadI1 r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| LoadI1 x m
+       LoadI2 r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| LoadI2 x m              
+       LoadI3 r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| LoadI3 x m              
+       LoadI4 r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadI4 x m             
+       LoadI5 r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadI5 x m             
+       LoadI6 r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadI6 x m              
+       LoadANeg r m ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadANeg x m           
+       LoadXNeg r m ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| LoadXNeg x m            
+       LoadI1Neg r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| LoadI1Neg x m            
+       LoadI2Neg r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadI2Neg x m           
+       LoadI3Neg r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadI3Neg x m           
+       LoadI4Neg r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadI4Neg x m           
+       LoadI5Neg r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadI5Neg x m 
+       LoadI6Neg r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  LoadI6Neg x m 
+       StoreA r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|     StoreA x m 
+       StoreX r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|     StoreX x m
+       StoreI1 r m ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|    StoreI1 x m
+       StoreI2 r m ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|    StoreI2 x m
+       StoreI3 r m ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|    StoreI3 x m
+       StoreI4 r m ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|    StoreI4 x m
+       StoreI5 r m ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|    StoreI5 x m
+       StoreI6 r m ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|    StoreI6 x m
+       StoreJ r m ->     case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|     StoreJ x m
+       StoreZero r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  StoreZero x m
+       Add r m ->        case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| Add x m
+       Sub r m ->        case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| Sub x m 
+       AddX m ->         Ok <| AddX m
+       SubX m ->         Ok <| SubX m
+       EnterA r ->       case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterA x
+       EnterX r ->       case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterX x
+       EnterI1 r ->      case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterI1 x
+       EnterI2 r ->      case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterI2 x
+       EnterI3 r ->      case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterI3 x
+       EnterI4 r ->      case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterI4 x
+       EnterI5 r ->      case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterI5 x
+       EnterI6 r ->      case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterI6 x
+       EnterANeg r ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterANeg x
+       EnterXNeg r ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| EnterXNeg x
+       EnterI1Neg r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  EnterI1Neg x
+       EnterI2Neg r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  EnterI2Neg x
+       EnterI3Neg r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  EnterI3Neg x
+       EnterI4Neg r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  EnterI4Neg x
+       EnterI5Neg r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  EnterI5Neg x
+       EnterI6Neg r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  EnterI6Neg x
+       IncrementA r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  IncrementA x
+       IncrementX r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  IncrementX x
+       IncrementI1 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| IncrementI1 x
+       IncrementI2 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| IncrementI2 x
+       IncrementI3 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|    IncrementI3 x
+       IncrementI4 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| IncrementI4 x
+       IncrementI5 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| IncrementI5 x
+       IncrementI6 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| IncrementI6 x
+       DecrementA r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| DecrementA x
+       DecrementX r ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  DecrementX x
+       DecrementI1 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| DecrementI1 x
+       DecrementI2 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| DecrementI2 x
+       DecrementI3 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| DecrementI3 x
+       DecrementI4 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| DecrementI4 x
+       DecrementI5 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| DecrementI5 x
+       DecrementI6 r ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| DecrementI6 x
+       CompareA r m ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| CompareA x m
+       CompareX r m ->   case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| CompareX x m
+       CompareI1 r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| CompareI1 x m
+       CompareI2 r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  CompareI2 x m
+       CompareI3 r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  CompareI3 x m
+       CompareI4 r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  CompareI4 x m
+       CompareI5 r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  CompareI5 x m
+       CompareI6 r m ->  case r of
+                             Err err -> Err err
+                             Ok x -> Ok <|  CompareI6 x m
+       Jump r ->         case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| Jump x
+       JumpSaveJ r ->    case r of
+                             Err err -> Err err
+                             Ok x -> Ok <| JumpSaveJ x
+       JumpOnOverflow r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpOnOverflow x
+       JumpOnNoOverflow r ->    case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|  JumpOnNoOverflow x
+       JumpOnLess r ->          case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|   JumpOnLess x
+       JumpOnEqual r ->         case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|  JumpOnEqual x
+       JumpOnGreater r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpOnGreater x
+       JumpOnGreaterEqual r ->  case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpOnGreaterEqual x 
+       JumpOnUnEqual r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpOnUnEqual x
+       JumpOnLessEqual r ->     case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpOnLessEqual x
+       JumpANegative r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpANegative x
+       JumpAZero r ->           case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpAZero x
+       JumpAPositive r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpAPositive x 
+       JumpANonNegative r ->    case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|  JumpANonNegative x
+       JumpANonZero r ->        case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpANonZero x
+       JumpANonPositive r ->    case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|  JumpANonPositive x
+       JumpXNegative r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpXNegative x
+       JumpXZero r ->           case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpXZero x
+       JumpXPositive r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpXPositive x
+       JumpXNonNegative r ->    case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|  JumpXNonNegative x
+       JumpXNonZero r ->        case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpXNonZero x
+       JumpXNonPositive r ->    case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|  JumpXNonPositive x
+       JumpI1Negative r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI1Negative x
+       JumpI1Zero r ->          case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|   JumpI1Zero x
+       JumpI1Positive r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI1Positive x
+       JumpI1NonNegative r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI1NonNegative x
+       JumpI1NonZero r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI1NonZero x
+       JumpI1NonPositive r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI1NonPositive x
+       JumpI2Negative r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI2Negative x
+       JumpI2Zero r ->          case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|   JumpI2Zero x
+       JumpI2Positive r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI2Positive x
+       JumpI2NonNegative r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI2NonNegative x
+       JumpI2NonZero r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI2NonZero x
+       JumpI2NonPositive r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI2NonPositive x
+       JumpI3Negative r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI3Negative x
+       JumpI3Zero r ->          case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|   JumpI3Zero x
+       JumpI3Positive r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI3Positive x
+       JumpI3NonNegative r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI3NonNegative x
+       JumpI3NonZero r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI3NonZero x
+       JumpI3NonPositive r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI3NonPositive x
+       JumpI4Negative r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI4Negative x
+       JumpI4Zero r ->          case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|   JumpI4Zero x
+       JumpI4Positive r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI4Positive x
+       JumpI4NonNegative r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI4NonNegative x
+       JumpI4NonZero r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI4NonZero x 
+       JumpI4NonPositive r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI4NonPositive x
+       JumpI5Negative r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI5Negative x
+       JumpI5Zero r ->          case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|   JumpI5Zero x
+       JumpI5Positive r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI5Positive x
+       JumpI5NonNegative r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI5NonNegative x
+       JumpI5NonZero r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI5NonZero x
+       JumpI5NonPositive r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI5NonPositive x
+       JumpI6Negative r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI6Negative x
+       JumpI6Zero r ->          case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|   JumpI6Zero x
+       JumpI6Positive r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    JumpI6Positive x
+       JumpI6NonNegative r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI6NonNegative x
+       JumpI6NonZero r ->       case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|  JumpI6NonZero x
+       JumpI6NonPositive r ->   case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| JumpI6NonPositive x
+       ShiftA r ->              case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|       ShiftA x
+       ShiftX r ->              case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|       ShiftX x
+       ShiftACircular r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <|    ShiftACircular x
+       ShiftXCircular r ->      case r of
+                                    Err err -> Err err
+                                    Ok x -> Ok <| ShiftXCircular x
+       SwapAX ->             Ok SwapAX
+       MoveXI1 ->            Ok MoveXI1
+       MoveXI2 ->            Ok MoveXI2
+       MoveXI3 ->            Ok MoveXI3
+       MoveXI4 ->            Ok MoveXI4
+       MoveXI5 ->            Ok MoveXI5
+       MoveXI6 ->            Ok MoveXI6
+       NoOperation ->        Ok NoOperation
+       Halt        ->        Ok Halt
+
 
 
 mapInstruction : (a -> b) -> Instruction a -> Instruction b
