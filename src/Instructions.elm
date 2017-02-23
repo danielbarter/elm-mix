@@ -29,9 +29,10 @@ unpack (s,b1,b2,b3,b4,b5) = ( smallWordValue (s,b1,b2)
                             , byteToMasks b4
                             , value b5
                             )
-    
+
 type alias StaticInstruction = Instruction (Index,Address)
 type alias DynamicInstruction = Instruction Address
+
 
 type Instruction a = LoadA a Masks         -- LDA 
                    | LoadX a Masks         -- LDX 

@@ -8,9 +8,6 @@ import Dict
 import Instructions exposing (..)
 import Atom exposing (..)
 
-
-
-
 type alias Memory = Dict.Dict Address Word
 
 -- the default memory value is zeroWord
