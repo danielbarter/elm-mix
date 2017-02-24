@@ -214,3 +214,18 @@ compileLine l =
         [N n,Colon,N m]
             -> Ok (n, ASMLit m)
         _ -> Err UnexpectedTokenSequence
+
+
+
+distrubuteError : List (Result e a) -> Result e (List a)
+distrubuteError l =
+    case l of
+        [] -> Ok []
+        (x::xs) -> case x of
+                       Err err -> Err err
+                       Ok t -> Result.map ((::) t) <| distrubuteError xs
+
+compile : String -> Result CompileError (List Line)
+compile s = distrubuteError <| List.map compileLine
+            <| List.map tokenize
+            <| String.lines s
