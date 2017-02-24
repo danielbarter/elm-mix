@@ -1,4 +1,6 @@
-module ASMParser exposing (..)
+module ASMParser exposing ( compile
+                          , tokenize
+                          )
 
 import StateMonad exposing (..)
 import Assembler exposing (..)
