@@ -39,6 +39,7 @@ module Atom exposing ( Base
                      , Index
                      , UnpackedWord
                      , unpack
+                     , pack
                      )
 
 type alias Base = Int
@@ -304,6 +305,10 @@ unpack (s,b1,b2,b3,b4,b5) = ( smallWordValue (s,b1,b2)
                             , value b5
                             )
 
+pack : UnpackedWord -> Word
+pack (a,i,f,c) =
+    let (s,b1,b2) = Tuple.second <| intToSmallWord a zeroSmallWord
+    in (s,b1,b2,byte i,byte f,byte c)
 
 -- tuple generics
 map3 : (a1 -> b1) -> (a2 -> b2) -> (a3 -> b3) -> (a1,a2,a3) -> (b1,b2,b3)
