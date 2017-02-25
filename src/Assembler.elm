@@ -1,8 +1,8 @@
-module Assembler exposing ( ASM(..)
-                          , assemble
+module Assembler exposing ( assemble
                           , tokenize
                           , parse
                           , compile
+                          , CompileError(..)
                           )
 
 import Atom exposing (..)

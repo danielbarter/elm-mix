@@ -4,6 +4,7 @@ module Mix exposing ( MemoryTag(..)
                     , MetaMemory
                     , readMeta
                     , read
+                    , load
                     , Mix
                     , instructionTransition
                     )

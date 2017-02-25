@@ -1,5 +1,5 @@
 module MixStep exposing ( step
-                        , RuntimeError
+                        , RuntimeError(..)
                         , MixOperation
                         )
 
