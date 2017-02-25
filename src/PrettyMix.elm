@@ -3,24 +3,55 @@ module PrettyMix exposing (..)
 import Mix exposing (..)
 import Atom exposing (..)
 import Instruction exposing (..)
+import Dict
 
-ppA w     = "A  = " ++ ( toString <| wordValue w)
-ppX w     = "X  = " ++ ( toString <| wordValue w)
-ppI1 w    = "I1 = " ++ ( toString <| wordValue w)
-ppI2 w    = "I2 = " ++ ( toString <| wordValue w)
-ppI3 w    = "I3 = " ++ ( toString <| wordValue w)
-ppI4 w    = "I4 = " ++ ( toString <| wordValue w)
-ppI5 w    = "I5 = " ++ ( toString <| wordValue w)
-ppI6 w    = "I6 = " ++ ( toString <| wordValue w)
-ppJ  w    = "J  = " ++ ( toString <| wordValue w)
-ppCount p = "p  = " ++ ( toString p )
+ppA w        = "A  = " ++ ( toString <| wordValue w)
+ppX w        = "X  = " ++ ( toString <| wordValue w)
+ppI1 w       = "I1 = " ++ ( toString <| smallWordValue w)
+ppI2 w       = "I2 = " ++ ( toString <| smallWordValue w)
+ppI3 w       = "I3 = " ++ ( toString <| smallWordValue w)
+ppI4 w       = "I4 = " ++ ( toString <| smallWordValue w)
+ppI5 w       = "I5 = " ++ ( toString <| smallWordValue w)
+ppI6 w       = "I6 = " ++ ( toString <| smallWordValue w)
+ppJ  w       = "J  = " ++ ( toString <| smallWordValue w)
+ppCount p    = "p  = " ++ ( toString p )
+ppOverflow t = "ov = " ++ ( toString t )
+ppComp c     = "cp = " ++ ( toString c )
 
-{-
-ppMemLoc : Address -> Memory -> MetaMemory -> String
-ppMemLoc a mem meta =
+ppMemLoc : Memory -> MetaMemory -> Address -> String
+ppMemLoc mem meta a =
     let w = read a mem
         t = readMeta a meta
     in case t of
            Number -> (toString a) ++ ": " ++ (toString <| wordValue w)
-           Instruction -> (toString a) ++ ": "
--}
+           Instruction -> case decodeInstruction <| unpack w of
+                              Ok i  -> (toString a) ++ ": " ++ (ppInstruction i)
+                              Err _ -> (toString a)
+                                       ++ ": "
+                                       ++ (toString <| wordValue w)
+
+ppInstruction : StaticInstruction -> String
+ppInstruction (a,i,ms,t) = (toString <| value <| masksToByte  ms) ++ " " ++
+                           (toString t) ++ " " ++
+                           (toString a) ++ " " ++ (toString i)
+
+ppMem : Memory -> MetaMemory -> String
+ppMem mem meta = String.join "\n"
+                 <| List.map (ppMemLoc mem meta) <| Dict.keys mem
+
+ppMix : Mix -> String
+ppMix m = String.join "\n"
+          [ ppA m.a
+          , ppX m.x
+          , ppI1 m.i1
+          , ppI2 m.i2
+          , ppI3 m.i3
+          , ppI4 m.i4
+          , ppI5 m.i5
+          , ppI6 m.i6
+          , ppJ m.j
+          , ppCount m.p
+          , ppOverflow m.overflow
+          , ppComp m.comparison
+          , ppMem m.mem m.meta
+          ]
