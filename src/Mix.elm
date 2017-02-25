@@ -31,8 +31,6 @@ readMeta a meta = Maybe.withDefault Number <| Dict.get a meta
 read : Address -> Memory -> Word
 read a mem = Maybe.withDefault zeroWord <| Dict.get a mem
 
-
-
 type alias Mix = { a   : Word
                  , x   : Word
                  , i1  : SmallWord

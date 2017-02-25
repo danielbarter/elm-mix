@@ -8,7 +8,9 @@ module Model exposing ( Model
 import Assembler exposing (..)
 import Mix exposing (..)
 import MixStep exposing (..)
-import Html
+import Html exposing (..)
+import Html.Attributes exposing (placeholder)
+import Html.Events exposing (onClick,onInput)
 
 type alias Model =
     { sourceCode : String
@@ -21,6 +23,7 @@ type alias Model =
 type Msg = Compile
          | StepForward
          | StepBackward
+         | Store String
 
 
 
@@ -52,6 +55,7 @@ update message model =
             -> case model.mixs of
                    [] -> model
                    (m :: ms) -> { model | mixs = ms }
+        Store s -> { model | sourceCode = s }
 
 
 model = { sourceCode = ""
@@ -60,5 +64,18 @@ model = { sourceCode = ""
         , runtimeError = Nothing
         }
 
-view : Model -> Html.Html Msg
-view m = Html.text "Hello World!"
+view : Model -> Html Msg
+view m = div [] [ sourceCode
+                , buttons
+                ]
+
+buttons : Html Msg
+buttons = div []
+          [ button [ onClick Compile ] [ text "compile" ]
+          , button [ onClick StepForward ] [ text "step" ]
+          , button [ onClick StepBackward ] [ text "back" ]
+          ]
+
+sourceCode : Html Msg
+sourceCode = div []
+             [ textarea [ placeholder "write source code here", onInput Store ] [] ]
