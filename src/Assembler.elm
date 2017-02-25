@@ -232,8 +232,8 @@ filterNothing l =
 type CompileError = UnexpectedTokenSequence
 
 
-compileLine : List Token -> Result CompileError (Maybe Line)
-compileLine l =
+parseLine : List Token -> Result CompileError (Maybe Line)
+parseLine l =
     case l of
         [] -> Ok <| Nothing
         [N n, Colon, I t, N a, Comma, N i]
@@ -246,9 +246,9 @@ compileLine l =
 
 
 
-compile : String -> Result CompileError (List Line)
-compile s = Result.map filterNothing
+parse : String -> Result CompileError (List Line)
+parse s = Result.map filterNothing
             <| distrubuteError
-            <| List.map compileLine
+            <| List.map parseLine
             <| List.map tokenize
             <| String.lines s

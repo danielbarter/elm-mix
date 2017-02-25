@@ -24,6 +24,7 @@ execution cycle:
 type RuntimeError = NoMemoryValue Address
                   | InstructionDecodeError DecodeError
                   | InvalidIndex Index
+                  | CompileTimeError
 
 
 type alias MixOperation a = State Mix RuntimeError a
