@@ -48,6 +48,24 @@ type alias Mix = { a   : Word
                  , comparison : ComparisonIndicator
                  }
 
+load : (MetaMemory,Memory) -> Mix
+load (metaMemory,memory) =
+    { a = zeroWord
+    , x = zeroWord
+    , i1 = zeroSmallWord
+    , i2 = zeroSmallWord
+    , i3 = zeroSmallWord
+    , i4 = zeroSmallWord
+    , i5 = zeroSmallWord
+    , i6 = zeroSmallWord
+    , j = zeroSmallWord
+    , p = 0
+    , mem = memory
+    , meta = metaMemory
+    , overflow = Good
+    , comparison = E
+    }
+
 {-
 
 design point:

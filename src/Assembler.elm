@@ -1,4 +1,9 @@
-module Assembler exposing (..)
+module Assembler exposing ( ASM(..)
+                          , assemble
+                          , tokenize
+                          , parse
+                          , compile
+                          )
 
 import Atom exposing (..)
 import StateMonad exposing (..)
@@ -236,6 +241,8 @@ parseLine : List Token -> Result CompileError (Maybe Line)
 parseLine l =
     case l of
         [] -> Ok <| Nothing
+        [N n,Colon,I t, N a]
+            -> Ok <| Just (n,ASMInstruction (a,0,byteToMasks <| byte 0,t))
         [N n, Colon, I t, N a, Comma, N i]
             -> Ok <| Just (n, ASMInstruction (a,i,byteToMasks <| byte 0,t))
         [N n, Colon, N m, I t, N a, Comma, N i]
@@ -252,3 +259,7 @@ parse s = Result.map filterNothing
             <| List.map parseLine
             <| List.map tokenize
             <| String.lines s
+
+
+compile : String -> Result CompileError (MetaMemory,Memory)
+compile s = Result.map assemble <| parse s
