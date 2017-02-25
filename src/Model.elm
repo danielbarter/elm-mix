@@ -5,6 +5,8 @@ module Model exposing ( Model
                       , view
                       )
 
+
+import PrettyMix exposing (..)
 import Assembler exposing (..)
 import Mix exposing (..)
 import MixStep exposing (..)
@@ -19,7 +21,17 @@ type alias Model =
     , runtimeError : Maybe RuntimeError
     }
 
-
+ppModel : Model -> List String
+ppModel m =
+    case m.compileError of
+        Just err -> [toString err]
+        Nothing -> case m.runtimeError of
+                       Just err -> [toString err]
+                       Nothing -> case m.mixs of
+                                      [] -> ["Compile a program!"]
+                                      (x::xs) -> ppMix x
+                
+    
 type Msg = Compile
          | StepForward
          | StepBackward
@@ -54,7 +66,10 @@ update message model =
         StepBackward
             -> case model.mixs of
                    [] -> model
-                   (m :: ms) -> { model | mixs = ms }
+                   (m :: ms) -> { model
+                                | mixs = ms
+                                , runtimeError = Nothing
+                                }
         Store s -> { model | sourceCode = s }
 
 
@@ -65,9 +80,11 @@ model = { sourceCode = ""
         }
 
 view : Model -> Html Msg
-view m = div [] [ sourceCode
+view m = div [] ([ sourceCode
                 , buttons
-                ]
+                ] ++ (List.map (div []
+                                << List.singleton
+                                << text) <| ppModel m))
 
 buttons : Html Msg
 buttons = div []
@@ -78,4 +95,5 @@ buttons = div []
 
 sourceCode : Html Msg
 sourceCode = div []
-             [ textarea [ placeholder "write source code here", onInput Store ] [] ]
+             [ textarea [ placeholder "Write source code here.", onInput Store ] [] ]
+

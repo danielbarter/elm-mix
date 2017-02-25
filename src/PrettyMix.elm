@@ -1,4 +1,4 @@
-module PrettyMix exposing (..)
+module PrettyMix exposing (ppMix)
 
 import Mix exposing (..)
 import Atom exposing (..)
@@ -35,13 +35,11 @@ ppInstruction (a,i,ms,t) = (toString <| value <| masksToByte  ms) ++ " " ++
                            (toString t) ++ " " ++
                            (toString a) ++ " " ++ (toString i)
 
-ppMem : Memory -> MetaMemory -> String
-ppMem mem meta = String.join "\n"
-                 <| List.map (ppMemLoc mem meta) <| Dict.keys mem
+ppMem : Memory -> MetaMemory -> List String
+ppMem mem meta = List.map (ppMemLoc mem meta) <| Dict.keys mem
 
-ppMix : Mix -> String
-ppMix m = String.join "\n"
-          [ ppA m.a
+ppMix : Mix -> List String
+ppMix m = [ ppA m.a
           , ppX m.x
           , ppI1 m.i1
           , ppI2 m.i2
@@ -53,5 +51,4 @@ ppMix m = String.join "\n"
           , ppCount m.p
           , ppOverflow m.overflow
           , ppComp m.comparison
-          , ppMem m.mem m.meta
-          ]
+          ] ++ (ppMem m.mem m.meta)
