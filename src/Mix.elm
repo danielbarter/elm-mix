@@ -1,4 +1,12 @@
-module Mix exposing (..)
+module Mix exposing ( MemoryTag(..)
+                    , MetaData
+                    , Memory
+                    , MetaMemory
+                    , readMeta
+                    , read
+                    , Mix
+                    , instructionTransition
+                    )
 
 import Dict
 import Instruction exposing (..)
