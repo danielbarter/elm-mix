@@ -247,6 +247,8 @@ parseLine l =
             -> Ok <| Just (n, ASMInstruction (a,i,byteToMasks <| byte 0,t))
         [N n, Colon, N m, I t, N a, Comma, N i]
             -> Ok <| Just (n,ASMInstruction (a,i,byteToMasks <| byte m,t))
+        [N n, Colon, N m, I t, N a]
+            -> Ok <| Just (n,ASMInstruction (a,0,byteToMasks <| byte m,t))
         [N n, Colon, N m]
             -> Ok <| Just (n, ASMNumber m)
         _ -> Err UnexpectedTokenSequence
