@@ -53,7 +53,7 @@ decodeInstructionOp =
     get >>= nextWord >>= unpackOp >>= decodeOp
 
 -- phase 2
-incrementCounter : MixOperation () 
+incrementCounter : MixOperation ()
 incrementCounter =
     let op m = { m | p = m.p + 1 }
     in (op <$> get) >>= put
@@ -79,7 +79,7 @@ relativiseInstructionOp s = get >>= (flip relativiseInstruction) s
 
 -- phase 4
 executeInstructionOp : DynamicInstruction -> MixOperation DynamicInstruction
-executeInstructionOp d = (((instructionTransition d) <$> get) >>= put) *> return d 
+executeInstructionOp d = (((instructionTransition d) <$> get) >>= put) *> return d
 
 step : MixOperation DynamicInstruction
 step = (decodeInstructionOp <* incrementCounter)

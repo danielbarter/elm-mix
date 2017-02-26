@@ -30,8 +30,8 @@ ppModel m =
                        Nothing -> case m.mixs of
                                       [] -> ["Compile a program!"]
                                       (x::xs) -> ppMix x
-                
-    
+
+
 type Msg = Compile
          | StepForward
          | StepBackward
@@ -96,4 +96,3 @@ buttons = div []
 sourceCode : Html Msg
 sourceCode = div []
              [ textarea [ placeholder "Write source code here.", onInput Store ] [] ]
-

@@ -22,7 +22,7 @@ type alias Memory = Dict.Dict Address Word
 type alias MetaMemory = Dict.Dict Address MetaData
 
 -- the default meta data is a number tag
-    
+
 readMeta : Address -> MetaMemory -> MetaData
 readMeta a meta = Maybe.withDefault Number <| Dict.get a meta
 
@@ -81,9 +81,9 @@ instructionTransition (adr,masks,i) s =
     case i of
         LoadA
             -> { s | a = copy masks (read adr s.mem) s.a }
-        LoadX 
+        LoadX
             -> { s | x = copy masks (read adr s.mem) s.x }
-        LoadI1 
+        LoadI1
             -> { s | i1 = wordContract
                         <| copy masks (read adr s.mem)
                         <| wordExpand s.i1 }
@@ -91,176 +91,176 @@ instructionTransition (adr,masks,i) s =
             -> { s | i2 = wordContract
                         <| copy masks (read adr s.mem)
                         <| wordExpand s.i2 }
-        LoadI3 
+        LoadI3
             -> { s | i3 = wordContract
                         <| copy masks (read adr s.mem)
                         <| wordExpand s.i3 }
-        LoadI4 
+        LoadI4
             -> { s | i4 = wordContract
                         <| copy masks (read adr s.mem)
                         <| wordExpand s.i4 }
-        LoadI5 
+        LoadI5
             -> { s | i5 = wordContract
                         <| copy masks (read adr s.mem)
                         <| wordExpand s.i5 }
-        LoadI6 
+        LoadI6
             -> { s | i6 = wordContract
                         <| copy masks (read adr s.mem)
                         <| wordExpand s.i6 }
-        LoadANeg 
+        LoadANeg
             -> { s | a = copy masks (flipSignWord <| read adr s.mem) s.a }
-        LoadXNeg 
+        LoadXNeg
             -> { s | x = copy masks (flipSignWord <| read adr s.mem) s.x }
-        LoadI1Neg 
+        LoadI1Neg
             -> { s | i1 = wordContract
                         <| copy masks (flipSignWord <| read adr s.mem)
                         <| wordExpand s.i1 }
-        LoadI2Neg 
+        LoadI2Neg
             -> { s | i2 = wordContract
                         <| copy masks (flipSignWord <| read adr s.mem)
                         <| wordExpand s.i2 }
-        LoadI3Neg 
+        LoadI3Neg
             -> { s | i3 = wordContract
                         <| copy masks (flipSignWord <| read adr s.mem)
                         <| wordExpand s.i3 }
-        LoadI4Neg 
+        LoadI4Neg
             -> { s | i4 = wordContract
                         <| copy masks (flipSignWord <| read adr s.mem)
                         <| wordExpand s.i4 }
-        LoadI5Neg 
+        LoadI5Neg
             -> { s | i5 = wordContract
                         <| copy masks (flipSignWord <| read adr s.mem)
                         <| wordExpand s.i5 }
-        LoadI6Neg 
+        LoadI6Neg
             -> { s | i6 = wordContract
                         <| copy masks (flipSignWord <| read adr s.mem)
                         <| wordExpand s.i6 }
-        StoreA 
+        StoreA
             -> { s | mem = Dict.insert adr
                      (copy masks s.a <| read adr s.mem)
                      s.mem
                }
-        StoreX 
+        StoreX
             -> { s | mem = Dict.insert adr
                      (copy masks s.x <| read adr s.mem)
                      s.mem
                }
-        StoreI1 
+        StoreI1
             -> { s | mem = Dict.insert adr
                      (copy masks (wordExpand s.i1) <| read adr s.mem)
                      s.mem
                }
-        StoreI2 
+        StoreI2
             -> { s | mem = Dict.insert adr
                      (copy masks (wordExpand s.i2) <| read adr s.mem)
                      s.mem
                }
-        StoreI3 
+        StoreI3
             -> { s | mem = Dict.insert adr
                      (copy masks (wordExpand s.i3) <| read adr s.mem)
                      s.mem
                }
-        StoreI4 
+        StoreI4
             -> { s | mem = Dict.insert adr
                      (copy masks (wordExpand s.i4) <| read adr s.mem)
                      s.mem
                }
-        StoreI5 
+        StoreI5
             -> { s | mem = Dict.insert adr
                      (copy masks (wordExpand s.i5) <| read adr s.mem)
                      s.mem
                }
-        StoreI6 
+        StoreI6
             -> { s | mem = Dict.insert adr
                      (copy masks (wordExpand s.i6) <| read adr s.mem)
                      s.mem
                }
-        StoreJ 
+        StoreJ
             -> { s | mem = Dict.insert adr
                      (copy masks (wordExpand s.j) <| read adr s.mem)
                      s.mem
                }
-        StoreZero 
+        StoreZero
             -> { s | mem = Dict.insert adr
                      (copy masks zeroWord <| read adr s.mem)
                      s.mem
                }
-        Add 
+        Add
             -> let (t,r) = op (+) masks s.a <| read adr s.mem
                in { s | a = r
                       , overflow = t
                   }
-        Sub 
+        Sub
             -> let (t,r) = op (-) masks s.a <| read adr s.mem
                in { s | a = r
                       , overflow = t
                   }
-        AddX 
+        AddX
             -> let (t,r) = op (+) masks s.a <| s.x
                in { s | a = r
                       , overflow = t
                   }
-        SubX 
+        SubX
             -> let (t,r) = op (-) masks s.a <| s.x
                in { s | a = r
                   , overflow = t
                   }
-        EnterA 
+        EnterA
             -> let (t,r) = intToWord adr s.a
                in { s | a = r
                   , overflow = t
                   }
-        EnterX 
+        EnterX
             -> let (t,r) = intToWord adr s.x
                in { s | x = r
                   , overflow = t
                   }
-        EnterI1 
+        EnterI1
             -> let (t,r) = intToSmallWord adr s.i1
                in { s | i1 = r
                   , overflow = t
                   }
-        EnterI2 
+        EnterI2
             -> let (t,r) = intToSmallWord adr s.i2
                in { s | i2 = r
                   , overflow = t
                   }
-        EnterI3 
+        EnterI3
             -> let (t,r) = intToSmallWord adr s.i3
                in { s | i3 = r
                   , overflow = t
                   }
-        EnterI4 
+        EnterI4
             -> let (t,r) = intToSmallWord adr s.i4
                in { s | i4 = r
                   , overflow = t
                   }
-        EnterI5 
+        EnterI5
             -> let (t,r) = intToSmallWord adr s.i5
                in { s | i5 = r
                   , overflow = t
                   }
-        EnterI6 
+        EnterI6
             -> let (t,r) = intToSmallWord adr s.i6
                in { s | i6 = r
                   , overflow = t
                   }
-        EnterANeg 
+        EnterANeg
             -> let (t,r) = intToWord (negate adr) s.a
                in { s | a = r
                   , overflow = t
                   }
-        EnterXNeg 
+        EnterXNeg
             -> let (t,r) = intToWord (negate adr) s.x
                in { s | x = r
                   , overflow = t
                   }
-        EnterI1Neg 
+        EnterI1Neg
             -> let (t,r) = intToSmallWord (negate adr) s.i1
                in { s | i1 = r
                   , overflow = t
                   }
-        EnterI2Neg 
+        EnterI2Neg
             -> let (t,r) = intToSmallWord (negate adr) s.i2
                in { s | i2 = r
                   , overflow = t
@@ -270,67 +270,67 @@ instructionTransition (adr,masks,i) s =
                in { s | i3 = r
                   , overflow = t
                   }
-        EnterI4Neg 
+        EnterI4Neg
             -> let (t,r) = intToSmallWord (negate adr) s.i4
                in { s | i4 = r
                   , overflow = t
                   }
-        EnterI5Neg 
+        EnterI5Neg
             -> let (t,r) = intToSmallWord (negate adr) s.i5
                in { s | i5 = r
                   , overflow = t
                   }
-        EnterI6Neg 
+        EnterI6Neg
             -> let (t,r) = intToSmallWord (negate adr) s.i6
                in { s | i6 = r
                   , overflow = t
                   }
-        IncrementA 
+        IncrementA
             -> let (t,r) = intToWord ( (wordValue s.a) + adr) s.a
                in { s | a = r
                   , overflow = t
                   }
-        IncrementX 
+        IncrementX
             -> let (t,r) = intToWord ( (wordValue s.x) + adr) s.x
                in { s | x = r
                   , overflow = t
                   }
-        IncrementI1 
+        IncrementI1
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i1) + adr) s.i1
                in { s | i1 = r
                   , overflow = t
                   }
-        IncrementI2 
+        IncrementI2
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i2) + adr) s.i2
                in { s | i2 = r
                   , overflow = t
                   }
-        IncrementI3 
+        IncrementI3
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i3) + adr) s.i3
                in { s | i3 = r
                   , overflow = t
                   }
-        IncrementI4 
+        IncrementI4
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i4) + adr) s.i4
                in { s | i4 = r
                   , overflow = t
                   }
-        IncrementI5 
+        IncrementI5
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i5) + adr) s.i5
                in { s | i5 = r
                   , overflow = t
                   }
-        IncrementI6 
+        IncrementI6
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i6) + adr) s.i6
                in { s | i6 = r
                   , overflow = t
                   }
-        DecrementA 
+        DecrementA
             -> let (t,r) = intToWord ( (wordValue s.a) - adr) s.a
                in { s | a = r
                   , overflow = t
                   }
-        DecrementX 
+        DecrementX
             -> let (t,r) = intToWord ( (wordValue s.x) - adr) s.x
                in { s | x = r
                   , overflow = t
@@ -340,64 +340,64 @@ instructionTransition (adr,masks,i) s =
                in { s | i1 = r
                   , overflow = t
                   }
-        DecrementI2 
+        DecrementI2
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i2) - adr) s.i2
                in { s | i2 = r
                   , overflow = t
                   }
-        DecrementI3 
+        DecrementI3
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i3) - adr) s.i3
                in { s | i3 = r
                   , overflow = t
                   }
-        DecrementI4 
+        DecrementI4
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i4) - adr) s.i4
                in { s | i4 = r
                   , overflow = t
                   }
-        DecrementI5 
+        DecrementI5
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i5) - adr) s.i5
                in { s | i5 = r
                   , overflow = t
                   }
-        DecrementI6 
+        DecrementI6
             -> let (t,r) = intToSmallWord ( (smallWordValue s.i6) - adr) s.i6
                in { s | i6 = r
                   , overflow = t
                   }
-        CompareA 
+        CompareA
             -> let c = comp masks s.a <| read adr s.mem
                in { s | comparison = c }
-        CompareX 
+        CompareX
             -> let c = comp masks s.x <| read adr s.mem
                in { s | comparison = c }
-        CompareI1 
+        CompareI1
             -> let c = comp masks (wordExpand s.i1) <| read adr s.mem
                in { s | comparison = c }
-        CompareI2 
+        CompareI2
             -> let c = comp masks (wordExpand s.i2) <| read adr s.mem
                in { s | comparison = c }
-        CompareI3 
+        CompareI3
             -> let c = comp masks (wordExpand s.i3) <| read adr s.mem
                in { s | comparison = c }
-        CompareI4 
+        CompareI4
             -> let c = comp masks (wordExpand s.i4) <| read adr s.mem
                in { s | comparison = c }
-        CompareI5 
+        CompareI5
             -> let c = comp masks (wordExpand s.i5) <| read adr s.mem
                in { s | comparison = c }
-        CompareI6 
+        CompareI6
             -> let c = comp masks (wordExpand s.i6) <| read adr s.mem
                in { s | comparison = c }
-        Jump 
+        Jump
             -> let (t,newJ) = intToSmallWord s.p s.j
                in { s
                   | p = adr
                   , j = newJ
                   }
-        JumpSaveJ 
+        JumpSaveJ
             -> { s | p = adr }
-        JumpOnOverflow 
+        JumpOnOverflow
             -> if s.overflow == Overflow
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -406,7 +406,7 @@ instructionTransition (adr,masks,i) s =
                        , overflow = Good
                        }
                else s
-        JumpOnNoOverflow 
+        JumpOnNoOverflow
             -> if s.overflow == Good
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -414,7 +414,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else { s | overflow = Good }
-        JumpOnLess 
+        JumpOnLess
             -> if s.comparison == L
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -422,7 +422,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpOnEqual 
+        JumpOnEqual
             -> if s.comparison == E
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -430,7 +430,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpOnGreater 
+        JumpOnGreater
             -> if s.comparison == G
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -438,7 +438,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpOnGreaterEqual 
+        JumpOnGreaterEqual
             -> if (s.comparison == G) || (s.comparison == E)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -446,7 +446,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpOnUnEqual 
+        JumpOnUnEqual
             -> if (s.comparison == L) || (s.comparison == G)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -454,7 +454,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpOnLessEqual 
+        JumpOnLessEqual
             -> if (s.comparison == L) || (s.comparison == E)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -462,7 +462,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpANegative 
+        JumpANegative
             -> if (wordValue s.a < 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -470,7 +470,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpAZero 
+        JumpAZero
             -> if (wordValue s.a == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -478,7 +478,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpAPositive 
+        JumpAPositive
             -> if (wordValue s.a > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -486,7 +486,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpANonNegative 
+        JumpANonNegative
             -> if (wordValue s.a > 0) || (wordValue s.a == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -494,7 +494,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpANonZero 
+        JumpANonZero
             -> if (wordValue s.a < 0) || (wordValue s.a > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -502,7 +502,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpANonPositive 
+        JumpANonPositive
             -> if (wordValue s.a < 0) || (wordValue s.a == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -510,7 +510,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpXNegative 
+        JumpXNegative
             -> if (wordValue s.x < 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -518,7 +518,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpXZero 
+        JumpXZero
             -> if (wordValue s.x == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -526,7 +526,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpXPositive 
+        JumpXPositive
             -> if (wordValue s.x > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -534,7 +534,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpXNonNegative 
+        JumpXNonNegative
             -> if (wordValue s.x > 0) || (wordValue s.x == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -542,7 +542,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpXNonZero 
+        JumpXNonZero
             -> if (wordValue s.x < 0) || (wordValue s.x > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -550,7 +550,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpXNonPositive 
+        JumpXNonPositive
             -> if (wordValue s.x < 0) || (wordValue s.x == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -558,7 +558,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI1Negative 
+        JumpI1Negative
             -> if (smallWordValue s.i1 < 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -566,7 +566,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI1Zero 
+        JumpI1Zero
             -> if (smallWordValue s.i1 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -574,7 +574,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI1Positive 
+        JumpI1Positive
             -> if (smallWordValue s.i1 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -582,7 +582,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI1NonNegative 
+        JumpI1NonNegative
             -> if (smallWordValue s.i1 > 0) || (smallWordValue s.i1 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -590,7 +590,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI1NonZero 
+        JumpI1NonZero
             -> if (smallWordValue s.i1 < 0) || (smallWordValue s.i1 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -598,7 +598,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI1NonPositive 
+        JumpI1NonPositive
             -> if (smallWordValue s.i1 < 0) || (smallWordValue s.i1 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -606,7 +606,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI2Negative 
+        JumpI2Negative
             -> if (smallWordValue s.i2 < 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -614,7 +614,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI2Zero 
+        JumpI2Zero
             -> if (smallWordValue s.i2 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -622,7 +622,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI2Positive 
+        JumpI2Positive
             -> if (smallWordValue s.i2 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -630,7 +630,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI2NonNegative 
+        JumpI2NonNegative
             -> if (smallWordValue s.i2 > 0) || (smallWordValue s.i2 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -638,7 +638,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI2NonZero 
+        JumpI2NonZero
             -> if (smallWordValue s.i2 < 0) || (smallWordValue s.i2 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -646,7 +646,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI2NonPositive 
+        JumpI2NonPositive
             -> if (smallWordValue s.i2 < 0) || (smallWordValue s.i2 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -654,7 +654,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI3Negative 
+        JumpI3Negative
             -> if (smallWordValue s.i3 < 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -662,7 +662,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI3Zero 
+        JumpI3Zero
             -> if (smallWordValue s.i3 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -670,7 +670,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI3Positive 
+        JumpI3Positive
             -> if (smallWordValue s.i3 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -678,7 +678,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI3NonNegative 
+        JumpI3NonNegative
             -> if (smallWordValue s.i3 > 0) || (smallWordValue s.i3 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -686,7 +686,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI3NonZero 
+        JumpI3NonZero
             -> if (smallWordValue s.i3 < 0) || (smallWordValue s.i3 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -694,7 +694,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI3NonPositive 
+        JumpI3NonPositive
             -> if (smallWordValue s.i3 < 0) || (smallWordValue s.i3 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -702,7 +702,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI4Negative 
+        JumpI4Negative
             -> if (smallWordValue s.i4 < 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -710,7 +710,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI4Zero 
+        JumpI4Zero
             -> if (smallWordValue s.i4 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -718,7 +718,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI4Positive 
+        JumpI4Positive
             -> if (smallWordValue s.i4 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -726,7 +726,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI4NonNegative 
+        JumpI4NonNegative
             -> if (smallWordValue s.i4 > 0) || (smallWordValue s.i4 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -734,7 +734,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI4NonZero 
+        JumpI4NonZero
             -> if (smallWordValue s.i4 < 0) || (smallWordValue s.i4 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -742,7 +742,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI4NonPositive 
+        JumpI4NonPositive
             -> if (smallWordValue s.i4 < 0) || (smallWordValue s.i4 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -750,7 +750,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI5Negative 
+        JumpI5Negative
             -> if (smallWordValue s.i5 < 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -758,7 +758,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI5Zero 
+        JumpI5Zero
             -> if (smallWordValue s.i5 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -766,7 +766,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI5Positive 
+        JumpI5Positive
             -> if (smallWordValue s.i5 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -774,7 +774,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI5NonNegative 
+        JumpI5NonNegative
             -> if (smallWordValue s.i5 > 0) || (smallWordValue s.i5 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -782,7 +782,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI5NonZero 
+        JumpI5NonZero
             -> if (smallWordValue s.i5 < 0) || (smallWordValue s.i5 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -790,7 +790,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI5NonPositive 
+        JumpI5NonPositive
             -> if (smallWordValue s.i5 < 0) || (smallWordValue s.i5 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -798,7 +798,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI6Negative 
+        JumpI6Negative
             -> if (smallWordValue s.i6 < 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -806,7 +806,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI6Zero 
+        JumpI6Zero
             -> if (smallWordValue s.i6 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -814,7 +814,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI6Positive 
+        JumpI6Positive
             -> if (smallWordValue s.i6 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -822,7 +822,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI6NonNegative 
+        JumpI6NonNegative
             -> if (smallWordValue s.i6 > 0) || (smallWordValue s.i6 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -830,7 +830,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI6NonZero 
+        JumpI6NonZero
             -> if (smallWordValue s.i6 < 0) || (smallWordValue s.i6 > 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -838,7 +838,7 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        JumpI6NonPositive 
+        JumpI6NonPositive
             -> if (smallWordValue s.i6 < 0) || (smallWordValue s.i6 == 0)
                then let (t,newJ) = intToSmallWord s.p s.j
                     in { s
@@ -846,13 +846,13 @@ instructionTransition (adr,masks,i) s =
                        , j = newJ
                        }
                else s
-        ShiftA 
+        ShiftA
             -> { s | a = shift adr s.a }
-        ShiftX 
+        ShiftX
             -> { s | x = shift adr s.x }
-        ShiftACircular 
+        ShiftACircular
             -> { s | a = shiftCircular adr s.a }
-        ShiftXCircular 
+        ShiftXCircular
             -> { s | x = shiftCircular adr s.x }
         SwapAX
             -> { s | a = s.x , x = s.a }

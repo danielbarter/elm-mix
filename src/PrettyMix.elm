@@ -30,11 +30,6 @@ ppMemLoc mem meta a =
                                        ++ ": "
                                        ++ (toString <| wordValue w)
 
-ppInstruction : StaticInstruction -> String
-ppInstruction (a,i,ms,t) = (toString <| value <| masksToByte  ms) ++ " " ++
-                           (toString t) ++ " " ++
-                           (toString a) ++ " " ++ (toString i)
-
 ppMem : Memory -> MetaMemory -> List String
 ppMem mem meta = List.map (ppMemLoc mem meta) <| Dict.keys mem
 
@@ -52,3 +47,10 @@ ppMix m = [ ppA m.a
           , ppOverflow m.overflow
           , ppComp m.comparison
           ] ++ (ppMem m.mem m.meta)
+
+
+
+ppInstruction : StaticInstruction -> String
+ppInstruction (a,i,ms,t) = (toString <| value <| masksToByte  ms) ++ " " ++
+                           (toString t) ++ " " ++
+                           (toString a) ++ " " ++ (toString i)

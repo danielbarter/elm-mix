@@ -30,8 +30,8 @@ try p q =
                   Err err -> q s
                   Ok (ss,x) -> Ok (ss,x)
     in r
-                  
-                
+
+
 return : a -> State s e a
 return x = let p s = Ok (s,x)
            in p
@@ -56,7 +56,7 @@ throwError err = let p s = Err err
                                            Ok (sss,x) -> Ok (sss, f x)
             in r
 
-                
+
 (<$>) : ( a -> b ) -> State s e a -> State s e b
 (<$>) f p = (return f) <*> p
 
@@ -72,4 +72,3 @@ map2 f p q = ( f <$> p ) <*> q
 (*>) : State s e a -> State s e b -> State s e b
 (*>) p q = let g x y = y
            in map2 g p q
-

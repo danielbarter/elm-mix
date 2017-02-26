@@ -65,7 +65,7 @@ baseExpandUnsigned b n = List.reverse <| baseExpandUnsignedLittle b n
 baseExpandUnsignedPad b n l = let u = baseExpandUnsigned b n
                                   len = List.length u
                               in (List.repeat (l - len) 0) ++ u
-                         
+
 baseExpand : Base -> Int -> (Sign,List Int)
 baseExpand b n = if n < 0
                  then (Neg, baseExpandUnsigned b <| -n)
@@ -115,7 +115,7 @@ byte n = Byte <| n % mixBase
 zero = byte 0
 zeroWord = (Pos,zero,zero,zero,zero,zero)
 zeroSmallWord = (Pos,zero,zero)
-       
+
 value : Byte -> Int
 value (Byte v) = v
 
@@ -150,7 +150,7 @@ flipSignSmallWord w = map3
 {-
 
 Knuth uses a somewhat strange masking convention. We can do better!
-A word contains 6 fields. To get all possible masks, we need 64 different values. 
+A word contains 6 fields. To get all possible masks, we need 64 different values.
 This fits into one Knuth byte.
 To extract the mask, expand base 2.
 
@@ -170,8 +170,8 @@ masksToByte (m1,m2,m3,m4,m5,m6) =
                   Off -> 0
                   On -> 1
     in byte <| baseContract 2 (Pos,List.map f [m1,m2,m3,m4,m5,m6])
-                              
-byteToMasks : Byte -> Masks 
+
+byteToMasks : Byte -> Masks
 byteToMasks (Byte n) =
     let bitToMask i = if i == 0 then Off else On
     in case baseExpandPad 2 n 6 of
@@ -200,13 +200,13 @@ byteToMasks (Byte n) =
 wordValue : Word -> Int
 wordValue (s,b1,b2,b3,b4,b5) =
     baseContract mixBase (s, List.map value [b1,b2,b3,b4,b5])
-            
+
 smallWordValue : SmallWord -> Int
 smallWordValue (s,b1,b2) =
     baseContract mixBase (s,List.map value [b1,b2])
 
 
- 
+
 
 
 {-
@@ -320,14 +320,14 @@ map4 : (a1 -> b1)
      -> (a4 -> b4)
      -> (a1,a2,a3,a4) -> (b1,b2,b3,b4)
 map4 f g h i (x,y,z,w) = (f x,g y,h z,i w)
-                     
+
 map6 : (a1 -> b1)
      -> (a2 -> b2)
      -> (a3 -> b3)
      -> (a4 -> b4)
      -> (a5 -> b5)
      -> (a6 -> b6)
-     -> (a1,a2,a3,a4,a5,a6) -> (b1,b2,b3,b4,b5,b6)   
+     -> (a1,a2,a3,a4,a5,a6) -> (b1,b2,b3,b4,b5,b6)
 map6 f g h i j k (x,y,z,w,p,q) = (f x, g y, h z, i w, j p, k q)
 
 map62 : (a1 -> b1 -> c1)
@@ -336,6 +336,6 @@ map62 : (a1 -> b1 -> c1)
      -> (a4 -> b4 -> c4)
      -> (a5 -> b5 -> c5)
      -> (a6 -> b6 -> c6)
-     -> (a1,a2,a3,a4,a5,a6) -> (b1,b2,b3,b4,b5,b6) -> (c1,c2,c3,c4,c5,c6)   
+     -> (a1,a2,a3,a4,a5,a6) -> (b1,b2,b3,b4,b5,b6) -> (c1,c2,c3,c4,c5,c6)
 map62 f g h i j k (x,y,z,w,p,q) (xx,yy,zz,ww,pp,qq)
     = (f x xx, g y yy, h z zz, i w ww, j p pp, k q qq)
