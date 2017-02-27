@@ -1,5 +1,7 @@
 module Instruction exposing ( Tag(..)
+                            , RelativeAddress(..)
                             , StaticInstruction
+                            , RelativeInstruction
                             , DynamicInstruction
                             , DecodeError
                             , decodeInstruction
@@ -9,11 +11,11 @@ module Instruction exposing ( Tag(..)
 
 import Atom exposing (..)
 
-type RelativeAddress = Location String
+type RelativeAddress = Label String
                      | Value Address
 
 type alias StaticInstruction   = (Address,Index,Masks,Tag)
-type alias RelativeInstruction = (RelativeAddress,Index,Mask,Tag)
+type alias RelativeInstruction = (RelativeAddress,Index,Masks,Tag)
 type alias DynamicInstruction  = (Address,Masks,Tag)
 
 

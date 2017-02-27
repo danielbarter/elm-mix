@@ -1,6 +1,8 @@
 module Tokenizer exposing ( tokenize
                           , tokenizeLines
                           , Token(..)
+                          , filterNothing
+                          , distrubuteError
                           )
 
 
@@ -30,21 +32,19 @@ getLexeme r s =
 
 type Token = I Tag
            | N Int
-           | L String
+           | Lab String
            | Colon
-           | Comma
 
 getInt = (N << (Result.withDefault 0) << String.toInt)
          <$> (getLexeme <| Regex.regex "-?[0-9]+")
 
-getLoc =  L <$> (getLexeme <| Regex.regex "[a-z]([a-z]|_)*")
+getLoc =  Lab <$> (getLexeme <| Regex.regex "[a-z]([a-z]|_)*")
 
 f t r = (return <| I <| t) <* (getLexeme <| Regex.regex r)
 
 getToken = List.foldl try getLoc
            [ getInt
            , (return Colon <* (getLexeme <| Regex.regex ":"))
-           , (return Comma <* (getLexeme <| Regex.regex ","))
            , f  Halt "HLT"
            , f   LoadA              "LDA"
            , f   LoadX              "LDX"
@@ -197,5 +197,31 @@ tokenize s = case getToken s of
                                     Just (c,s2) -> tokenize s2
                  Err StringEmpty -> []
 
+tagEmptyLine : List a -> Maybe (List a)
+tagEmptyLine l =
+    case l of
+        [] -> Nothing
+        _  -> Just l
+
+filterNothing : List (Maybe a) -> List a
+filterNothing l =
+    case l of
+        [] -> []
+        (x::xs) -> case x of
+                       Just z -> z :: (filterNothing xs)
+                       Nothing -> filterNothing xs
+
+
+distrubuteError : List (Result e a) -> Result e (List a)
+distrubuteError l =
+    case l of
+        [] -> Ok []
+        (x::xs) -> case x of
+                       Err err -> Err err
+                       Ok t -> Result.map ((::) t) <| distrubuteError xs
+
+
 tokenizeLines : String -> List (List Token)
-tokenizeLines s = List.map tokenize <| String.lines s
+tokenizeLines s = filterNothing
+                  <| List.map (tagEmptyLine << tokenize)
+                  <| String.lines s
