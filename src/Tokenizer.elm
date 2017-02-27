@@ -30,16 +30,20 @@ getLexeme r s =
 
 type Token = I Tag
            | N Int
+           | L String
            | Colon
            | Comma
 
 getInt = (N << (Result.withDefault 0) << String.toInt)
          <$> (getLexeme <| Regex.regex "-?[0-9]+")
 
+getLoc =  L <$> (getLexeme <| Regex.regex "[a-z]([a-z]|_)*")
+
 f t r = (return <| I <| t) <* (getLexeme <| Regex.regex r)
 
-getToken = List.foldl try getInt
-           [ (return Colon <* (getLexeme <| Regex.regex ":"))
+getToken = List.foldl try getLoc
+           [ getInt
+           , (return Colon <* (getLexeme <| Regex.regex ":"))
            , (return Comma <* (getLexeme <| Regex.regex ","))
            , f  Halt "HLT"
            , f   LoadA              "LDA"

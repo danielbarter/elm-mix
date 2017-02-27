@@ -16,7 +16,7 @@ import Html.Events exposing (onClick,onInput)
 
 type alias Model =
     { sourceCode : String
-    , compileError : Maybe CompileError
+    , compileError : Maybe ASMCompileError
     , mixs : List Mix
     , runtimeError : Maybe RuntimeError
     }

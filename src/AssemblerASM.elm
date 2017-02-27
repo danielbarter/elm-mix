@@ -1,7 +1,7 @@
 module AssemblerASM exposing ( assembleASM
                              , parseASM
                              , compileASM
-                             , CompileError(..)
+                             , ASMCompileError(..)
                              )
 
 
@@ -33,10 +33,10 @@ filterNothing l =
                        Just z -> z :: (filterNothing xs)
                        Nothing -> filterNothing xs
 
-type CompileError = UnexpectedTokenSequence
+type ASMCompileError = UnexpectedTokenSequence
 
 
-parseLine : List Token -> Result CompileError (Maybe Line)
+parseLine : List Token -> Result ASMCompileError (Maybe Line)
 parseLine l =
     case l of
         [] -> Ok <| Nothing
@@ -54,7 +54,7 @@ parseLine l =
 
 
 
-parseASM : List (List Token) -> Result CompileError (List Line)
+parseASM : List (List Token) -> Result ASMCompileError (List Line)
 parseASM s = Result.map filterNothing
             <| distrubuteError
             <| List.map parseLine s
@@ -78,5 +78,5 @@ assembleASM l =
     in (meta, mem)
 
 
-compileASM : String -> Result CompileError (MetaMemory,Memory)
+compileASM : String -> Result ASMCompileError (MetaMemory,Memory)
 compileASM s = Result.map assembleASM <| parseASM <| tokenizeLines s

@@ -9,8 +9,14 @@ module Instruction exposing ( Tag(..)
 
 import Atom exposing (..)
 
-type alias StaticInstruction = (Address,Index,Masks,Tag)
-type alias DynamicInstruction = (Address,Masks,Tag)
+type RelativeAddress = Location String
+                     | Value Address
+
+type alias StaticInstruction   = (Address,Index,Masks,Tag)
+type alias RelativeInstruction = (RelativeAddress,Index,Mask,Tag)
+type alias DynamicInstruction  = (Address,Masks,Tag)
+
+
 
 type Tag = LoadA                 -- LDA
          | LoadX                 -- LDX
