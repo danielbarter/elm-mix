@@ -1,8 +1,8 @@
-module Assembler exposing ( assemble
-                          , parse
-                          , compile
-                          , CompileError(..)
-                          )
+module AssemblerASM exposing ( assembleASM
+                             , parseASM
+                             , compileASM
+                             , CompileError(..)
+                             )
 
 
 import Atom exposing (..)
@@ -54,8 +54,8 @@ parseLine l =
 
 
 
-parse : List (List Token) -> Result CompileError (List Line)
-parse s = Result.map filterNothing
+parseASM : List (List Token) -> Result CompileError (List Line)
+parseASM s = Result.map filterNothing
             <| distrubuteError
             <| List.map parseLine s
 
@@ -71,12 +71,12 @@ assembleLine (a,i) =
                             ,(a,Instruction)
                             )
 
-assemble : List Line -> (MetaMemory,Memory)
-assemble l =
+assembleASM : List Line -> (MetaMemory,Memory)
+assembleASM l =
     let meta = Dict.fromList <| List.map (Tuple.second << assembleLine) l
         mem = Dict.fromList <| List.map (Tuple.first << assembleLine) l
     in (meta, mem)
 
 
-compile : String -> Result CompileError (MetaMemory,Memory)
-compile s = Result.map assemble <| parse <| tokenizeLines s
+compileASM : String -> Result CompileError (MetaMemory,Memory)
+compileASM s = Result.map assembleASM <| parseASM <| tokenizeLines s

@@ -7,7 +7,7 @@ module Model exposing ( Model
 
 
 import PrettyMix exposing (..)
-import Assembler exposing (..)
+import AssemblerASM exposing (..)
 import Mix exposing (..)
 import MixStep exposing (..)
 import Html exposing (..)
@@ -43,7 +43,7 @@ update : Msg -> Model -> Model
 update message model =
     case message of
         Compile
-            -> case compile model.sourceCode of
+            -> case compileASM model.sourceCode of
                    Err err -> { model
                               | compileError = Just err
                               }
