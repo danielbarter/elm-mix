@@ -8,6 +8,7 @@ module StateMonad exposing   ( State
                              , (<*>)
                              , (<$>)
                              , map2
+                             , map5
                              , (<*)
                              , (*>)
                              )
@@ -64,6 +65,30 @@ throwError err = let p s = Err err
 map2 : ( a -> b -> c) -> State s e a -> State s e b -> State s e c
 map2 f p q = ( f <$> p ) <*> q
 
+map3 : ( a -> b -> c -> d )
+     -> State s e a
+     -> State s e b
+     -> State s e c
+     -> State s e d
+map3 f p q r = (f <$> p ) <*> q <*> r
+
+
+map4 : ( a -> b -> c -> d -> f )
+     -> State s e a
+     -> State s e b
+     -> State s e c
+     -> State s e d
+     -> State s e f
+map4 f p q r x = (f <$> p) <*> q <*> r <*> x
+
+map5 : ( a -> b -> c -> d -> f -> g )
+     -> State s e a
+     -> State s e b
+     -> State s e c
+     -> State s e d
+     -> State s e f
+     -> State s e g
+map5 f p q r x y = (f <$> p) <*> q <*> r <*> x <*> y
 
 (<*) : State s e a -> State s e b -> State s e a
 (<*) p q = let f x y = x

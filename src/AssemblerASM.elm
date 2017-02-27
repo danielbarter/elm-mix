@@ -32,7 +32,4 @@ assembleASM l =
     in (meta, mem)
 
 
-{-
-compileASM : String -> Result ASMCompileError (MetaMemory,Memory)
-compileASM s = Result.map assembleASM <| parseASM <| tokenizeLines s
--}
+
