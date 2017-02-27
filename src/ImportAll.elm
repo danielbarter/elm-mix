@@ -10,6 +10,8 @@ import CodeFunctor exposing (..)
 import Tokenizer exposing (..)
 import Parser exposing (..)
 import Transpiler exposing (..)
+import Assembler exposing (..)
+import Compiler exposing (..)
 import ExamplePrograms exposing (..)
 
 

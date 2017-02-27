@@ -5,7 +5,6 @@ the tokenizer converts a string into a list of tokens for parsing.
 -}
 
 module Tokenizer exposing ( tokenize
-                          , tokenizeLines
                           , Token(..)
                           , filterNothing
                           , distrubuteError
@@ -195,13 +194,13 @@ getToken = List.foldl try getLoc
            ]
 
 
-tokenize : String -> List Token
-tokenize s = case getToken s of
-                 Ok (s1,t)   -> t :: (tokenize s1)
-                 Err NoMatch -> case String.uncons s of
-                                    Nothing -> []
-                                    Just (c,s2) -> tokenize s2
-                 Err StringEmpty -> []
+tokenizeLine : String -> List Token
+tokenizeLine s = case getToken s of
+                     Ok (s1,t)   -> t :: (tokenizeLine s1)
+                     Err NoMatch -> case String.uncons s of
+                                        Nothing -> []
+                                        Just (c,s2) -> tokenizeLine s2
+                     Err StringEmpty -> []
 
 tagEmptyLine : List a -> Maybe (List a)
 tagEmptyLine l =
@@ -227,8 +226,8 @@ distrubuteError l =
                        Ok t -> Result.map ((::) t) <| distrubuteError xs
 
 
-tokenizeLines : String -> List (List Token)
-tokenizeLines s = filterNothing
-                  <| List.map (tagEmptyLine << tokenize)
+tokenize : String -> List (List Token)
+tokenize s = filterNothing
+                  <| List.map (tagEmptyLine << tokenizeLine)
                   <| String.lines s
 
