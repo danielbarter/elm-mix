@@ -1,10 +1,3 @@
-{-
-
-This file contains the atomic data types and functions which we use to build the machine.
-
--}
-
-
 module Atom exposing ( Base
                      , Sign(..)
                      , swap

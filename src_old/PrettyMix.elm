@@ -1,10 +1,3 @@
-{-
-
-A pretty printer for the MixState
-
--}
-
-
 module PrettyMix exposing (ppMix)
 
 import Mix exposing (..)

@@ -1,10 +1,3 @@
-{-
-
-An state monad which fails upon error.
-We use this for the tokenizer, parser and machine state update
-
--}
-
 module StateMonad exposing   ( State
                              , (>>=)
                              , return
@@ -104,4 +97,3 @@ map5 f p q r x y = (f <$> p) <*> q <*> r <*> x <*> y
 (*>) : State s e a -> State s e b -> State s e b
 (*>) p q = let g x y = y
            in map2 g p q
-

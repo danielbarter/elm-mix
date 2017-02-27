@@ -1,9 +1,3 @@
-{-
-
-the tokenizer converts a string into a list of tokens for parsing.
-
--}
-
 module Tokenizer exposing ( tokenize
                           , tokenizeLines
                           , Token(..)
@@ -231,4 +225,3 @@ tokenizeLines : String -> List (List Token)
 tokenizeLines s = filterNothing
                   <| List.map (tagEmptyLine << tokenize)
                   <| String.lines s
-

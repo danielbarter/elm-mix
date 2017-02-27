@@ -1,10 +1,3 @@
-{-
-
-This is state and state transition function for MIX
-
--}
-
-
 module Mix exposing ( MemoryTag(..)
                     , MetaData
                     , Memory

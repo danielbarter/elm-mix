@@ -1,11 +1,3 @@
-{-
-
-bundling the state transition function up into a usable package.
-
--}
-
-
-
 module MixStep exposing ( step
                         , RuntimeError(..)
                         , MixOperation

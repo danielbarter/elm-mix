@@ -1,10 +1,3 @@
-{-
-
-The instruction data type.
-It is used to organize the machine state transition function
-
--}
-
 module Instruction exposing ( Tag(..)
                             , RelativeAddress(..)
                             , StaticInstruction
