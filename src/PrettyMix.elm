@@ -52,11 +52,11 @@ ppMix m = [ ppA m.a
 
 ppMaskInstruction : StaticInstruction -> String
 ppMaskInstruction (a,i,ms,t) = (toString <| value <| masksToByte  ms) ++ " " ++
-                               (toString t) ++ " " ++
+                               (ppTag t) ++ " " ++
                                (toString a) ++ " " ++ (toString i)
 
 ppNoMaskInstruction : StaticInstruction -> String
-ppNoMaskInstruction (a,i,ms,t) = (toString t) ++ " " ++
+ppNoMaskInstruction (a,i,ms,t) = (ppTag t) ++ " " ++
                                  (toString a) ++ " " ++ (toString i)
 
 
