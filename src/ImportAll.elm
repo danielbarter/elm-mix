@@ -13,6 +13,5 @@ import Assembler exposing (..)
 import Compiler exposing (..)
 import ExamplePrograms exposing (..)
 import Model exposing (..)
-import PrettyMemData exposing (..)
 
 x = 42

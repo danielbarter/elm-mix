@@ -18,8 +18,6 @@ module Mix exposing ( MemoryTag(..)
                     , instructionTransition
                     , CurrentInstruction
                     , MemData
-                    , memData
-                    , totalMemData
                     )
 
 import Dict
@@ -68,21 +66,24 @@ type alias Mix = { a   : Word
 
 type alias CurrentInstruction = Bool
 
-type alias MemData = (Address,Maybe String,MemoryTag,Word,CurrentInstruction)
+type alias MemData = ( Address
+                     , Maybe String
+                     , Maybe Int
+                     , Maybe Tag
+                     , Maybe RelativeAddress
+                     , Maybe Index
+                     , CurrentInstruction
+                     )
 
+{-
 memData : Mix
         -> Address
         -> MemData
 
-memData m n = ( n
-              , Dict.get n m.reverseSymbolTable
-              , readMeta n m.meta
-              , read n m.mem
-              , n == m.p
-              )
-
 totalMemData : Mix -> List MemData
 totalMemData m = List.map (memData m) <| Dict.keys m.mem
+-}
+
 
 load : (MetaMemory,Memory,SymbolTable,ReverseSymbolTable) -> Mix
 load (metaMemory,memory,st,rst) =
