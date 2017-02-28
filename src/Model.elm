@@ -6,7 +6,7 @@ import Compiler exposing (..)
 
 type alias Model = { sourceCode : String
                    , compileError : Maybe CompilerError
-                   , mix : Maybe Mix
+                   , mix : List Mix
                    , runtimeError : Maybe RuntimeError
                    , mode : Mode
                    }
@@ -14,3 +14,8 @@ type alias Model = { sourceCode : String
 type Mode = Edit | Stop | Run
 
 type Msg = Compile
+         | KillCurrentCore
+         | StepForward
+         | StepBackward
+         | ReadCode String
+
