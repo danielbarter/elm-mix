@@ -11,4 +11,6 @@ type alias Model = { sourceCode : String
                    , mode : Mode
                    }
 
-type Mode = Edit | Run
+type Mode = Edit | Stop | Run
+
+type Msg = Compile

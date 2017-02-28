@@ -28,7 +28,7 @@ zipWithAddress rs =
     in List.map2 f ads rs
 
 f : Int -> REL -> Intermediate
-f n r = mapCode (\l -> (l,n)) identity r
+f n r = mapCode (\l -> (l,n)) identity identity r
 
 distrubuteNothing : (Maybe a,b) -> Maybe (a,b)
 distrubuteNothing (l,n) =
@@ -41,22 +41,28 @@ symbolTable : List Intermediate -> SymbolTable
 symbolTable li =  Dict.fromList <| filterNothing
                   <| List.map ( distrubuteNothing << address) li
 
-
 evaluateLabel : SymbolTable
-              -> RelativeInstruction
-              -> Result TranspileError StaticInstruction
-evaluateLabel s (r,i,m,t) =
+              -> RelativeAddress
+              -> Result TranspileError Address
+evaluateLabel s r =
     case r of
-        Value a -> Ok (a,i,m,t)
+        Value a -> Ok a
         Label l -> case Dict.get l s of
                        Nothing -> Err <| NonDeclaredLabel l
-                       Just a -> Ok  (a,i,m,t)
+                       Just a -> Ok a
+
+evaluateLabelInst : SymbolTable
+              -> RelativeInstruction
+              -> Result TranspileError StaticInstruction
+evaluateLabelInst s (r,i,m,t) =
+    Result.map (\a -> (a,i,m,t)) <| evaluateLabel s r
 
 
 
 intermediateToASM : SymbolTable -> Intermediate -> Result TranspileError ASM
 intermediateToASM s i =
-   distrubuteCodeError <| mapCode Tuple.second (evaluateLabel s) i
+   distrubuteCodeError
+   <| mapCode Tuple.second (evaluateLabel s) (evaluateLabelInst s) i
 
 transpile : List REL -> Result TranspileError (List ASM,SymbolTable)
 transpile l =

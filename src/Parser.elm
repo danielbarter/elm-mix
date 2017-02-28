@@ -15,7 +15,7 @@ import Tokenizer exposing (..)
 import CodeFunctor exposing (..)
 import Instruction exposing (..)
 
-type ParserError = UnexpectedLabel String
+type ParserError = NothingRightNow
 
 
 getInstruction : List Token -> Maybe Tag
@@ -79,9 +79,7 @@ parseLine l =
         address = getRelativeAddressDefault l
         index = getIndexDefault l
     in case tag of
-           Nothing -> case address of
-                          Label name -> Err <| UnexpectedLabel name
-                          Value x -> Ok <| Code label <| DataNumber x
+           Nothing -> Ok <| Code label <| DataNumber address
            Just i -> Ok <| Code label <| DataInstruction (address,index,masks,i)
 
 parse : List (List Token) -> Result ParserError (List REL)

@@ -13,4 +13,5 @@ ex1 = """
       INCA 2
       STA x
    :x 4
+   :y x
        """
