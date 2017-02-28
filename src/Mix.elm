@@ -9,6 +9,8 @@ module Mix exposing ( MemoryTag(..)
                     , MetaData
                     , Memory
                     , MetaMemory
+                    , SymbolTable
+                    , ReverseSymbolTable
                     , readMeta
                     , read
                     , load
@@ -27,6 +29,10 @@ type alias MetaData = MemoryTag
 
 type alias Memory = Dict.Dict Address Word
 type alias MetaMemory = Dict.Dict Address MetaData
+
+type alias SymbolTable = Dict.Dict String Int
+type alias ReverseSymbolTable = Dict.Dict Int String
+
 
 -- the default meta data is a number tag
 
@@ -50,12 +56,14 @@ type alias Mix = { a   : Word
                  , p   : Address -- program counter
                  , mem : Memory
                  , meta : MetaMemory
+                 , symbolTable : SymbolTable
+                 , reverseSymbolTable : ReverseSymbolTable
                  , overflow : OverflowToggle
                  , comparison : ComparisonIndicator
                  }
 
-load : (MetaMemory,Memory) -> Mix
-load (metaMemory,memory) =
+load : (MetaMemory,Memory,SymbolTable,ReverseSymbolTable) -> Mix
+load (metaMemory,memory,st,rst) =
     { a = zeroWord
     , x = zeroWord
     , i1 = zeroSmallWord
@@ -68,6 +76,8 @@ load (metaMemory,memory) =
     , p = 0
     , mem = memory
     , meta = metaMemory
+    , symbolTable = st
+    , reverseSymbolTable = rst
     , overflow = Good
     , comparison = E
     }

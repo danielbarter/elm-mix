@@ -13,11 +13,18 @@ import Parser exposing (..)
 import Transpiler exposing (..)
 import Assembler exposing (..)
 import Mix exposing (..)
+import Dict
 
 type CompilerError = ParserPhaseError ParserError
                    | TranspilePhaseError TranspileError
 
-compile : String -> Result CompilerError (Memory,MetaMemory,SymbolTable)
+compile : String
+        -> Result CompilerError ( Memory
+                                , MetaMemory
+                                , SymbolTable
+                                , ReverseSymbolTable
+                                )
+
 compile s =
     let t = tokenize s
         p = parse t
@@ -26,4 +33,9 @@ compile s =
            Ok r -> case transpile r of
                        Err err -> Err <| TranspilePhaseError err
                        Ok (a,st) -> let (meta,mem) = assemble a
-                               in Ok (mem,meta,st)
+                               in Ok (mem,meta,st,reverse st)
+
+
+reverse : Dict.Dict String Int -> Dict.Dict Int String
+reverse d = Dict.fromList <| List.map (\(x,y) -> (y,x)) <| Dict.toList d
+

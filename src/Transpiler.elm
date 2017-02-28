@@ -6,7 +6,6 @@ To do this, we build a symbol table to resolve names.
 -}
 
 module Transpiler exposing ( transpile
-                           , SymbolTable
                            , TranspileError
                            )
 
@@ -14,9 +13,10 @@ import CodeFunctor exposing (..)
 import Atom exposing (..)
 import Instruction exposing (..)
 import Tokenizer exposing (..)
+import Mix exposing (..)
 import Dict
 
-type alias SymbolTable = Dict.Dict String Int
+
 
 type TranspileError = NonDeclaredLabel String
 
