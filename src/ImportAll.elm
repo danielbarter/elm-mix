@@ -12,6 +12,6 @@ import Transpiler exposing (..)
 import Assembler exposing (..)
 import Compiler exposing (..)
 import ExamplePrograms exposing (..)
-
+import Model exposing (..)
 
 x = 42
