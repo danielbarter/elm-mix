@@ -6,10 +6,11 @@ example programs
 
 -}
 
-module ExamplePrograms exposing (..)
+module ExamplePrograms exposing (ex1)
 
 ex1 =
     """
+     # multiplication routine
      :start LDA y
      JAZ end
      DECA 1
