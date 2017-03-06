@@ -260,6 +260,6 @@ HLT
 :y 6
 ```
 
-This is alpha software and there are probably bugs. I plan to polish it over the next few months.
+This is alpha software and there are probably bugs. I plan to polish it over the next few months. The source code can be inspected on [github](https://github.com/danielbarter/elm-mix).
 
          """
