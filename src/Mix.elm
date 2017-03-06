@@ -17,6 +17,8 @@ module Mix exposing ( MemoryTag(..)
                     , Mix
                     , instructionTransition
                     , CurrentInstruction
+                    , MemData
+                    , ppMemData
                     )
 
 import Dict
