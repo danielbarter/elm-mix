@@ -18,8 +18,9 @@ ex1 =
      ADD s
      STA s
      JMP start
-     :end HLT
+     :end LDA s
+     HLT
      :s 0
      :x 5
-     :y 6
+     :y 6           
      """

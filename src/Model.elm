@@ -1,6 +1,7 @@
 module Model exposing (..)
 
 import Atom exposing (..)
+import Instruction exposing (..)
 import Mix exposing (..)
 import MixStep exposing (..)
 import Compiler exposing (..)
@@ -13,8 +14,10 @@ type alias Model = { sourceCode : String
                    , compileError : Maybe CompilerError
                    , mix : List Mix
                    , runtimeError : Maybe RuntimeError
+                   , power : Power
                    }
 
+type Power = On | Off
 
 type Msg = Compile
          | KillCurrentCore
@@ -27,6 +30,7 @@ model =
     , compileError = Nothing
     , mix = []
     , runtimeError = Nothing
+    , power = Off
     }
 
 update : Msg -> Model -> Model
@@ -36,14 +40,17 @@ update msg model =
             -> case compile model.sourceCode of
                    Err e -> { model | compileError = Just e
                             , mix = []
+                            , power = Off
                             }
                    Ok x -> { model | compileError = Nothing
                            , mix = [load x]
+                           , power = On
                            }
         KillCurrentCore
             -> { model | compileError = Nothing
                , mix = []
                , runtimeError = Nothing
+               , power = Off
                }
         StepForward
             -> case model.mix of
@@ -51,14 +58,21 @@ update msg model =
                    (m::ms) -> case MixStep.step m of
                                  Err e -> { model | runtimeError = Just e }
                                  Ok (mm,i)
-                                     -> { model | mix = mm::(m::ms)
-                                        , runtimeError = Nothing
-                                        }
+                                     -> case i of
+                                            (_,_,Halt) -> { model | mix = mm::(m::ms)
+                                                          , runtimeError = Nothing
+                                                          , power = Off
+                                                          }
+                                            _ -> { model | mix = mm::(m::ms)
+                                                 , runtimeError = Nothing
+                                                 , power = On
+                                                 }
         StepBackward
             -> case model.mix of
                    [] -> model
                    (m::ms) -> { model | mix = ms
                               , runtimeError = Nothing
+                              , power = On
                               }
         ReadCode s -> { model | sourceCode = s }
 
@@ -73,18 +87,23 @@ view model =
               ]
         (m::ms) -> div []
                    [ sourceCodeBox
-                   , runtimeButtons
+                   , runtimeButtons model.power
                    , displayMix m
                    , errorMessage model.runtimeError
                    ]
 
-runtimeButtons : Html Msg
-runtimeButtons = div []
-                 [ button [onClick StepForward] [text "step"]
-                 , button [onClick StepBackward] [text "back"]
-                 , button [onClick KillCurrentCore] [text "kill core"]
-                 ]
-
+runtimeButtons : Power -> Html Msg
+runtimeButtons p =
+    case p of
+        On -> div []
+               [ button [onClick StepForward] [text "step"]
+               , button [onClick StepBackward] [text "back"]
+               , button [onClick KillCurrentCore] [text "kill core"]
+               ]
+        Off -> div []
+                [ button [onClick StepBackward] [text "back"]
+                , button [onClick KillCurrentCore] [text "kill core"]
+                ]
 compileButton : Html Msg
 compileButton = div []
                 [button [onClick Compile] [text "compile"]]
@@ -99,6 +118,7 @@ errorMessage e =
     case e of
         Nothing -> text ""
         Just err -> text <| toString err
+
 
 
 -----------------------------------------------------------------------------
@@ -121,6 +141,9 @@ boxStyle cb ct =
            , ("display","inline-block")
            , ("padding","10px")
            , ("border-radius","10px")
+           , ("border-size","2px")
+           , ("border-style","solid")
+           , ("border-color","white")
            ]
     ]
 
