@@ -13,5 +13,6 @@ import Assembler exposing (..)
 import Compiler exposing (..)
 import ExamplePrograms exposing (..)
 import Model exposing (..)
+import Main exposing (..)
 
 x = 42

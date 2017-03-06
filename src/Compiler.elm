@@ -19,8 +19,8 @@ type CompilerError = ParserPhaseError ParserError
                    | TranspilePhaseError TranspileError
 
 compile : String
-        -> Result CompilerError ( Memory
-                                , MetaMemory
+        -> Result CompilerError ( MetaMemory
+                                , Memory
                                 , SymbolTable
                                 , ReverseSymbolTable
                                 )
@@ -33,7 +33,7 @@ compile s =
            Ok r -> case transpile r of
                        Err err -> Err <| TranspilePhaseError err
                        Ok (a,st) -> let (meta,mem) = assemble a
-                               in Ok (mem,meta,st,reverse st)
+                               in Ok (meta,mem,st,reverse st)
 
 
 reverse : Dict.Dict String Int -> Dict.Dict Int String

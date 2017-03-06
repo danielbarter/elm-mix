@@ -18,7 +18,12 @@ module Mix exposing ( MemoryTag(..)
                     , instructionTransition
                     , CurrentInstruction
                     , MemData
+                    , totalMemData
                     , ppMemData
+                    , ppWord
+                    , ppSmallWord
+                    , ppOverflow
+                    , ppComparision
                     )
 
 import Dict
@@ -90,7 +95,25 @@ totalMemData : Mix -> List MemData
 totalMemData m = List.map (memData m) <| Dict.keys m.mem
 
 
+ppWord : Word -> (String,Color,Color)
+ppWord w = (toString <| wordValue w,lightCharcoal,black)
 
+ppSmallWord : SmallWord -> (String,Color,Color)
+ppSmallWord w = (toString <| smallWordValue w,darkCharcoal,white)
+
+ppOverflow : OverflowToggle -> (String,Color,Color)
+ppOverflow t =
+    case t of
+        Overflow -> ("Overflow",darkRed,white)
+        Good     -> ("Good",darkGreen,white)
+        Ignored ->  ("Fuck!",black,white)
+
+ppComparision : ComparisonIndicator -> (String,Color,Color)
+ppComparision t =
+    case t of
+        L -> ("<",lightRed,black)
+        E -> ("=",lightGrey,black)
+        G -> (">",lightGreen,black)
 
 ppMaybeAddress : Mix -> Maybe Address -> String
 ppMaybeAddress mix a =
@@ -131,22 +154,22 @@ ppPrefix a l =
         Nothing -> (toString a) ++ " > "
         Just x  -> (toString a) ++ " :" ++ x ++ " > "
 
-ppMemData : Mix -> MemData -> (String,Color)
+ppMemData : Mix -> MemData -> (String,Color,Color)
 ppMemData mix d =
     let (a,l,t,v,i,b) = d
         prefix = ppPrefix a l
         vv = ppMaybeAddress mix <| Just v
     in case t of
            Number -> if b
-                     then (prefix ++ vv,darkGrey)
-                     else (prefix ++ vv,lightGrey)
+                     then (prefix ++ vv,darkGrey,white)
+                     else (prefix ++ vv,lightGrey,black)
            Instruction
                -> case i of
                       Err err -> ppMemData mix (a,l,Number,v,i,b)
                       Ok inst -> let (s,c1,c2) = ppStaticInstructionClean mix inst
                                  in if b
-                                    then (prefix ++ s,c2)
-                                    else (prefix ++ s,c1)
+                                    then (prefix ++ s,c2,white)
+                                    else (prefix ++ s,c1,black)
 
 load : (MetaMemory,Memory,SymbolTable,ReverseSymbolTable) -> Mix
 load (metaMemory,memory,st,rst) =
