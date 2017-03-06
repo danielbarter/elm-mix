@@ -8,10 +8,18 @@ example programs
 
 module ExamplePrograms exposing (..)
 
-ex1 = """
-      LDA x
-      INCA 2
-      STA x
-   :x 4
-   :y x
-       """
+ex1 =
+    """
+     :start LDA y
+     JAZ end
+     DECA 1
+     STA y
+     LDA x
+     ADD s
+     STA s
+     JMP start
+     :end HLT
+     :s 0
+     :x 5
+     :y 6
+     """

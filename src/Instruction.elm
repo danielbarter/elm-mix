@@ -19,7 +19,6 @@ module Instruction exposing ( Tag(..)
                             )
 
 import Atom exposing (..)
-import Color exposing (..)
 
 type RelativeAddress = Label String
                      | Value Address
@@ -175,150 +174,150 @@ type Tag = LoadA                 -- LDA
          | Halt                  -- HLT
 
 
-ppTag : Tag -> (String,Color,Color)
+ppTag : Tag -> String
 ppTag t =
     case t of
-       LoadA                -> ( "LDA",lightRed,darkRed)
-       LoadX                -> ( "LDX",lightRed,darkRed)
-       LoadI1               -> ( "LD1",lightRed,darkRed)
-       LoadI2               -> ( "LD2",lightRed,darkRed)
-       LoadI3               -> ( "LD3",lightRed,darkRed)
-       LoadI4               -> ( "LD4",lightRed,darkRed)
-       LoadI5               -> ( "LD5",lightRed,darkRed)
-       LoadI6               -> ( "LD6",lightRed,darkRed)
-       LoadANeg             -> ( "LDAN",lightRed,darkRed)
-       LoadXNeg             -> ( "LDXN",lightRed,darkRed)
-       LoadI1Neg            -> ( "LD1N",lightRed,darkRed)
-       LoadI2Neg            -> ( "LD2N",lightRed,darkRed)
-       LoadI3Neg            -> ( "LD3N",lightRed,darkRed)
-       LoadI4Neg            -> ( "LD4N",lightRed,darkRed)
-       LoadI5Neg            -> ( "LD5N",lightRed,darkRed)
-       LoadI6Neg            -> ( "LD6N",lightRed,darkRed)
-       StoreA               -> ( "STA",lightBlue,darkBlue)
-       StoreX               -> ( "STX",lightBlue,darkBlue)
-       StoreI1              -> ( "ST1",lightBlue,darkBlue)
-       StoreI2              -> ( "ST2",lightBlue,darkBlue)
-       StoreI3              -> ( "ST3",lightBlue,darkBlue)
-       StoreI4              -> ( "ST4",lightBlue,darkBlue)
-       StoreI5              -> ( "ST5",lightBlue,darkBlue)
-       StoreI6              -> ( "ST6",lightBlue,darkBlue)
-       StoreJ               -> ( "STJ",lightBlue,darkBlue)
-       StoreZero            -> ( "STZ",lightBlue,darkBlue)
-       Add                  -> ( "ADD",lightGreen,darkGreen)
-       Sub                  -> ( "SUB",lightGreen,darkGreen)
-       AddX                 -> ( "ADDX",lightGreen,darkGreen)
-       SubX                 -> ( "SUBX",lightGreen,darkGreen)
-       EnterA               -> ( "ENTA",lightOrange,darkOrange)
-       EnterX               -> ( "ENTX",lightOrange,darkOrange)
-       EnterI1              -> ( "ENT1",lightOrange,darkOrange)
-       EnterI2              -> ( "ENT2",lightOrange,darkOrange)
-       EnterI3              -> ( "ENT3",lightOrange,darkOrange)
-       EnterI4              -> ( "ENT4",lightOrange,darkOrange)
-       EnterI5              -> ( "ENT5",lightOrange,darkOrange)
-       EnterI6              -> ( "ENT6",lightOrange,darkOrange)
-       EnterANeg            -> ( "ENNA",lightOrange,darkOrange)
-       EnterXNeg            -> ( "ENNX",lightOrange,darkOrange)
-       EnterI1Neg           -> ( "ENN1",lightOrange,darkOrange)
-       EnterI2Neg           -> ( "ENN2",lightOrange,darkOrange)
-       EnterI3Neg           -> ( "ENN3",lightOrange,darkOrange)
-       EnterI4Neg           -> ( "ENN4",lightOrange,darkOrange)
-       EnterI5Neg           -> ( "ENN5",lightOrange,darkOrange)
-       EnterI6Neg           -> ( "ENN6",lightOrange,darkOrange)
-       IncrementA           -> ( "INCA",lightGreen,darkGreen)
-       IncrementX           -> ( "INCX",lightGreen,darkGreen)
-       IncrementI1          -> ( "INC1",lightGreen,darkGreen)
-       IncrementI2          -> ( "INC2",lightGreen,darkGreen)
-       IncrementI3          -> ( "INC3",lightGreen,darkGreen)
-       IncrementI4          -> ( "INC4",lightGreen,darkGreen)
-       IncrementI5          -> ( "INC5",lightGreen,darkGreen)
-       IncrementI6          -> ( "INC6",lightGreen,darkGreen)
-       DecrementA           -> ( "DECA",lightGreen,darkGreen)
-       DecrementX           -> ( "DECX",lightGreen,darkGreen)
-       DecrementI1          -> ( "DEC1",lightGreen,darkGreen)
-       DecrementI2          -> ( "DEC2",lightGreen,darkGreen)
-       DecrementI3          -> ( "DEC3",lightGreen,darkGreen)
-       DecrementI4          -> ( "DEC4",lightGreen,darkGreen)
-       DecrementI5          -> ( "DEC5",lightGreen,darkGreen)
-       DecrementI6          -> ( "DEC6",lightGreen,darkGreen)
-       CompareA             -> ( "CMPA",lightYellow,darkYellow)
-       CompareX             -> ( "CMPX",lightYellow,darkYellow)
-       CompareI1            -> ( "CMP1",lightYellow,darkYellow)
-       CompareI2            -> ( "CMP2",lightYellow,darkYellow)
-       CompareI3            -> ( "CMP3",lightYellow,darkYellow)
-       CompareI4            -> ( "CMP4",lightYellow,darkYellow)
-       CompareI5            -> ( "CMP5",lightYellow,darkYellow)
-       CompareI6            -> ( "CMP6",lightYellow,darkYellow)
-       Jump                 -> ( "JMP",lightPurple,darkPurple)
-       JumpSaveJ            -> ( "JSJ",lightPurple,darkPurple)
-       JumpOnOverflow       -> ( "JOV",lightPurple,darkPurple)
-       JumpOnNoOverflow     -> ( "JNOV",lightPurple,darkPurple)
-       JumpOnLess           -> ( "JL",lightPurple,darkPurple)
-       JumpOnEqual          -> ( "JE",lightPurple,darkPurple)
-       JumpOnGreater        -> ( "JG",lightPurple,darkPurple)
-       JumpOnGreaterEqual   -> ( "JGE",lightPurple,darkPurple)
-       JumpOnUnEqual        -> ( "JNE",lightPurple,darkPurple)
-       JumpOnLessEqual      -> ( "JLE",lightPurple,darkPurple)
-       JumpANegative        -> ( "JAN",lightPurple,darkPurple)
-       JumpAZero            -> ( "JAZ",lightPurple,darkPurple)
-       JumpAPositive        -> ( "JAP",lightPurple,darkPurple)
-       JumpANonNegative     -> ( "JANN",lightPurple,darkPurple)
-       JumpANonZero         -> ( "JANZ",lightPurple,darkPurple)
-       JumpANonPositive     -> ( "JANP",lightPurple,darkPurple)
-       JumpXNegative        -> ( "JXN",lightPurple,darkPurple)
-       JumpXZero            -> ( "JXZ",lightPurple,darkPurple)
-       JumpXPositive        -> ( "JXP",lightPurple,darkPurple)
-       JumpXNonNegative     -> ( "JXNN",lightPurple,darkPurple)
-       JumpXNonZero         -> ( "JXNZ",lightPurple,darkPurple)
-       JumpXNonPositive     -> ( "JXNP",lightPurple,darkPurple)
-       JumpI1Negative       -> ( "J1N",lightPurple,darkPurple)
-       JumpI1Zero           -> ( "J1Z",lightPurple,darkPurple)
-       JumpI1Positive       -> ( "J1P",lightPurple,darkPurple)
-       JumpI1NonNegative    -> ( "J1NN",lightPurple,darkPurple)
-       JumpI1NonZero        -> ( "J1NZ",lightPurple,darkPurple)
-       JumpI1NonPositive    -> ( "J1NP",lightPurple,darkPurple)
-       JumpI2Negative       -> ( "J2N",lightPurple,darkPurple)
-       JumpI2Zero           -> ( "J2Z",lightPurple,darkPurple)
-       JumpI2Positive       -> ( "J2P",lightPurple,darkPurple)
-       JumpI2NonNegative    -> ( "J2NN",lightPurple,darkPurple)
-       JumpI2NonZero        -> ( "J2NZ",lightPurple,darkPurple)
-       JumpI2NonPositive    -> ( "J2NP",lightPurple,darkPurple)
-       JumpI3Negative       -> ( "J3N",lightPurple,darkPurple)
-       JumpI3Zero           -> ( "J3Z",lightPurple,darkPurple)
-       JumpI3Positive       -> ( "J3P",lightPurple,darkPurple)
-       JumpI3NonNegative    -> ( "J3NN",lightPurple,darkPurple)
-       JumpI3NonZero        -> ( "J3NZ",lightPurple,darkPurple)
-       JumpI3NonPositive    -> ( "J3NP",lightPurple,darkPurple)
-       JumpI4Negative       -> ( "J4N",lightPurple,darkPurple)
-       JumpI4Zero           -> ( "J4Z",lightPurple,darkPurple)
-       JumpI4Positive       -> ( "J4P",lightPurple,darkPurple)
-       JumpI4NonNegative    -> ( "J4NN",lightPurple,darkPurple)
-       JumpI4NonZero        -> ( "J4NZ",lightPurple,darkPurple)
-       JumpI4NonPositive    -> ( "J4NP",lightPurple,darkPurple)
-       JumpI5Negative       -> ( "J5N",lightPurple,darkPurple)
-       JumpI5Zero           -> ( "J5Z",lightPurple,darkPurple)
-       JumpI5Positive       -> ( "J5P",lightPurple,darkPurple)
-       JumpI5NonNegative    -> ( "J5NN",lightPurple,darkPurple)
-       JumpI5NonZero        -> ( "J5NZ",lightPurple,darkPurple)
-       JumpI5NonPositive    -> ( "J5NP",lightPurple,darkPurple)
-       JumpI6Negative       -> ( "J6N",lightPurple,darkPurple)
-       JumpI6Zero           -> ( "J6Z",lightPurple,darkPurple)
-       JumpI6Positive       -> ( "J6P",lightPurple,darkPurple)
-       JumpI6NonNegative    -> ( "J6NN",lightPurple,darkPurple)
-       JumpI6NonZero        -> ( "J6NZ",lightPurple,darkPurple)
-       JumpI6NonPositive    -> ( "J6NP",lightPurple,darkPurple)
-       ShiftA               -> ( "SA",lightGreen,darkGreen)
-       ShiftX               -> ( "SX",lightGreen,darkGreen)
-       ShiftACircular       -> ( "SAC",lightGreen,darkGreen)
-       ShiftXCircular       -> ( "SAX",lightGreen,darkGreen)
-       SwapAX               -> ( "SWAP",lightGreen,darkGreen)
-       MoveXI1              -> ( "MOVX1",lightGreen,darkGreen)
-       MoveXI2              -> ( "MOVX2",lightGreen,darkGreen)
-       MoveXI3              -> ( "MOVX3",lightGreen,darkGreen)
-       MoveXI4              -> ( "MOVX4",lightGreen,darkGreen)
-       MoveXI5              -> ( "MOVX5",lightGreen,darkGreen)
-       MoveXI6              -> ( "MOVX6",lightGreen,darkGreen)
-       NoOperation          -> ( "NOP",lightBrown,darkBrown)
-       Halt                 -> ( "HLT",lightBrown,darkBrown)
+       LoadA                -> "LDA"
+       LoadX                -> "LDX"
+       LoadI1               -> "LD1"
+       LoadI2               -> "LD2"
+       LoadI3               -> "LD3"
+       LoadI4               -> "LD4"
+       LoadI5               -> "LD5"
+       LoadI6               -> "LD6"
+       LoadANeg             -> "LDAN"
+       LoadXNeg             -> "LDXN"
+       LoadI1Neg            -> "LD1N"
+       LoadI2Neg            -> "LD2N"
+       LoadI3Neg            -> "LD3N"
+       LoadI4Neg            -> "LD4N"
+       LoadI5Neg            -> "LD5N"
+       LoadI6Neg            -> "LD6N"
+       StoreA               -> "STA"
+       StoreX               -> "STX"
+       StoreI1              -> "ST1"
+       StoreI2              -> "ST2"
+       StoreI3              -> "ST3"
+       StoreI4              -> "ST4"
+       StoreI5              -> "ST5"
+       StoreI6              -> "ST6"
+       StoreJ               -> "STJ"
+       StoreZero            -> "STZ"
+       Add                  -> "ADD"
+       Sub                  -> "SUB"
+       AddX                 -> "ADDX"
+       SubX                 -> "SUBX"
+       EnterA               -> "ENTA"
+       EnterX               -> "ENTX"
+       EnterI1              -> "ENT1"
+       EnterI2              -> "ENT2"
+       EnterI3              -> "ENT3"
+       EnterI4              -> "ENT4"
+       EnterI5              -> "ENT5"
+       EnterI6              -> "ENT6"
+       EnterANeg            -> "ENNA"
+       EnterXNeg            -> "ENNX"
+       EnterI1Neg           -> "ENN1"
+       EnterI2Neg           -> "ENN2"
+       EnterI3Neg           -> "ENN3"
+       EnterI4Neg           -> "ENN4"
+       EnterI5Neg           -> "ENN5"
+       EnterI6Neg           -> "ENN6"
+       IncrementA           -> "INCA"
+       IncrementX           -> "INCX"
+       IncrementI1          -> "INC1"
+       IncrementI2          -> "INC2"
+       IncrementI3          -> "INC3"
+       IncrementI4          -> "INC4"
+       IncrementI5          -> "INC5"
+       IncrementI6          -> "INC6"
+       DecrementA           -> "DECA"
+       DecrementX           -> "DECX"
+       DecrementI1          -> "DEC1"
+       DecrementI2          -> "DEC2"
+       DecrementI3          -> "DEC3"
+       DecrementI4          -> "DEC4"
+       DecrementI5          -> "DEC5"
+       DecrementI6          -> "DEC6"
+       CompareA             -> "CMPA"
+       CompareX             -> "CMPX"
+       CompareI1            -> "CMP1"
+       CompareI2            -> "CMP2"
+       CompareI3            -> "CMP3"
+       CompareI4            -> "CMP4"
+       CompareI5            -> "CMP5"
+       CompareI6            -> "CMP6"
+       Jump                 -> "JMP"
+       JumpSaveJ            -> "JSJ"
+       JumpOnOverflow       -> "JOV"
+       JumpOnNoOverflow     -> "JNOV"
+       JumpOnLess           -> "JL"
+       JumpOnEqual          -> "JE"
+       JumpOnGreater        -> "JG"
+       JumpOnGreaterEqual   -> "JGE"
+       JumpOnUnEqual        -> "JNE"
+       JumpOnLessEqual      -> "JLE"
+       JumpANegative        -> "JAN"
+       JumpAZero            -> "JAZ"
+       JumpAPositive        -> "JAP"
+       JumpANonNegative     -> "JANN"
+       JumpANonZero         -> "JANZ"
+       JumpANonPositive     -> "JANP"
+       JumpXNegative        -> "JXN"
+       JumpXZero            -> "JXZ"
+       JumpXPositive        -> "JXP"
+       JumpXNonNegative     -> "JXNN"
+       JumpXNonZero         -> "JXNZ"
+       JumpXNonPositive     -> "JXNP"
+       JumpI1Negative       -> "J1N"
+       JumpI1Zero           -> "J1Z"
+       JumpI1Positive       -> "J1P"
+       JumpI1NonNegative    -> "J1NN"
+       JumpI1NonZero        -> "J1NZ"
+       JumpI1NonPositive    -> "J1NP"
+       JumpI2Negative       -> "J2N"
+       JumpI2Zero           -> "J2Z"
+       JumpI2Positive       -> "J2P"
+       JumpI2NonNegative    -> "J2NN"
+       JumpI2NonZero        -> "J2NZ"
+       JumpI2NonPositive    -> "J2NP"
+       JumpI3Negative       -> "J3N"
+       JumpI3Zero           -> "J3Z"
+       JumpI3Positive       -> "J3P"
+       JumpI3NonNegative    -> "J3NN"
+       JumpI3NonZero        -> "J3NZ"
+       JumpI3NonPositive    -> "J3NP"
+       JumpI4Negative       -> "J4N"
+       JumpI4Zero           -> "J4Z"
+       JumpI4Positive       -> "J4P"
+       JumpI4NonNegative    -> "J4NN"
+       JumpI4NonZero        -> "J4NZ"
+       JumpI4NonPositive    -> "J4NP"
+       JumpI5Negative       -> "J5N"
+       JumpI5Zero           -> "J5Z"
+       JumpI5Positive       -> "J5P"
+       JumpI5NonNegative    -> "J5NN"
+       JumpI5NonZero        -> "J5NZ"
+       JumpI5NonPositive    -> "J5NP"
+       JumpI6Negative       -> "J6N"
+       JumpI6Zero           -> "J6Z"
+       JumpI6Positive       -> "J6P"
+       JumpI6NonNegative    -> "J6NN"
+       JumpI6NonZero        -> "J6NZ"
+       JumpI6NonPositive    -> "J6NP"
+       ShiftA               -> "SA"
+       ShiftX               -> "SX"
+       ShiftACircular       -> "SAC"
+       ShiftXCircular       -> "SAX"
+       SwapAX               -> "SWAP"
+       MoveXI1              -> "MOVX1"
+       MoveXI2              -> "MOVX2"
+       MoveXI3              -> "MOVX3"
+       MoveXI4              -> "MOVX4"
+       MoveXI5              -> "MOVX5"
+       MoveXI6              -> "MOVX6"
+       NoOperation          -> "NOP"
+       Halt                 -> "HLT"
 
 
 
@@ -804,7 +803,3 @@ cleanStatic (a,i,m,t) =
         MoveXI6              -> (Nothing,Nothing,Nothing,t)
         NoOperation          -> (Nothing,Nothing,Nothing,t)
         Halt                 -> (Nothing,Nothing,Nothing,t)
-
-
-
-

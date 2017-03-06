@@ -67,12 +67,13 @@ view : Model -> Html Msg
 view model =
     case model.mix of
         [] -> div []
-              [ compileButton
-              , sourceCodeBox
+              [ sourceCodeBox
+              , compileButton
               , errorMessage model.compileError
               ]
         (m::ms) -> div []
-                   [ runtimeButtons
+                   [ sourceCodeBox
+                   , runtimeButtons
                    , displayMix m
                    , errorMessage model.runtimeError
                    ]
@@ -118,6 +119,8 @@ boxStyle cb ct =
     [style [ ("background-color",printColor cb)
            , ("color",printColor ct)
            , ("display","inline-block")
+           , ("padding","10px")
+           , ("border-radius","10px")
            ]
     ]
 
@@ -143,6 +146,12 @@ displaySmallWord w =
         (boxStyle cb ct)
         [text s]
 
+displayJump : SmallWord -> Html Msg
+displayJump w =
+    let (s,cb,ct) = ppJump w
+    in div
+        (boxStyle cb ct)
+        [text s]
 
 displayOverflow : OverflowToggle -> Html Msg
 displayOverflow t =
@@ -178,7 +187,7 @@ displayRegisters mix =
     , displaySmallWord mix.i4
     , displaySmallWord mix.i5
     , displaySmallWord mix.i6
-    , displaySmallWord mix.j
+    , displayJump mix.j
     , displayOverflow mix.overflow
     , displayComparison mix.comparison
     ]
@@ -187,7 +196,7 @@ displayMix : Mix -> Html Msg
 displayMix mix =
     div
     []
-    [ displayMem mix
-    , displayRegisters mix
+    [ displayRegisters mix
+    , displayMem mix
     ]
 

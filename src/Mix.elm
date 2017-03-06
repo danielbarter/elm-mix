@@ -21,6 +21,7 @@ module Mix exposing ( MemoryTag(..)
                     , totalMemData
                     , ppMemData
                     , ppWord
+                    , ppJump
                     , ppSmallWord
                     , ppOverflow
                     , ppComparision
@@ -101,6 +102,9 @@ ppWord w = (toString <| wordValue w,lightCharcoal,black)
 ppSmallWord : SmallWord -> (String,Color,Color)
 ppSmallWord w = (toString <| smallWordValue w,darkCharcoal,white)
 
+ppJump : SmallWord -> (String,Color,Color)
+ppJump w = (toString <| smallWordValue w,darkBlue,white)
+
 ppOverflow : OverflowToggle -> (String,Color,Color)
 ppOverflow t =
     case t of
@@ -111,9 +115,9 @@ ppOverflow t =
 ppComparision : ComparisonIndicator -> (String,Color,Color)
 ppComparision t =
     case t of
-        L -> ("<",lightRed,black)
-        E -> ("=",lightGrey,black)
-        G -> (">",lightGreen,black)
+        L -> ("<",darkRed,white)
+        E -> ("=",darkGrey,white)
+        G -> (">",darkGreen,white)
 
 ppMaybeAddress : Mix -> Maybe Address -> String
 ppMaybeAddress mix a =
@@ -136,23 +140,20 @@ ppMaybeMasks m =
         Just x -> "/" ++ ((toString << value << masksToByte ) x)
 
 
-ppStaticInstructionClean : Mix -> StaticInstructionClean -> (String,Color,Color)
+ppStaticInstructionClean : Mix -> StaticInstructionClean -> String
 ppStaticInstructionClean mix (a,i,m,t) =
-    let (st,c1,c2) = ppTag t
+    let st = ppTag t
         sa = ppMaybeAddress mix a
         si = ppMaybeIndex i
         sm = ppMaybeMasks m
-    in ( String.join " " [sm,st,sa,si]
-       , c1
-       , c2
-       )
+    in  String.join " " [sm,st,sa,si]
 
 
 ppPrefix : Address -> Maybe String -> String
 ppPrefix a l =
     case l of
-        Nothing -> (toString a) ++ " > "
-        Just x  -> (toString a) ++ " :" ++ x ++ " > "
+        Nothing -> ""
+        Just x  -> ":" ++ x ++ " "
 
 ppMemData : Mix -> MemData -> (String,Color,Color)
 ppMemData mix d =
@@ -161,15 +162,15 @@ ppMemData mix d =
         vv = ppMaybeAddress mix <| Just v
     in case t of
            Number -> if b
-                     then (prefix ++ vv,darkGrey,white)
-                     else (prefix ++ vv,lightGrey,black)
+                     then (prefix ++ vv,darkOrange,white)
+                     else (prefix ++ vv,lightCharcoal,black)
            Instruction
                -> case i of
                       Err err -> ppMemData mix (a,l,Number,v,i,b)
-                      Ok inst -> let (s,c1,c2) = ppStaticInstructionClean mix inst
+                      Ok inst -> let s = ppStaticInstructionClean mix inst
                                  in if b
-                                    then (prefix ++ s,c2,white)
-                                    else (prefix ++ s,c1,black)
+                                    then (prefix ++ s,darkOrange,white)
+                                    else (prefix ++ s,lightCharcoal,black)
 
 load : (MetaMemory,Memory,SymbolTable,ReverseSymbolTable) -> Mix
 load (metaMemory,memory,st,rst) =
