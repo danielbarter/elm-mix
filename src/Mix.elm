@@ -17,12 +17,12 @@ module Mix exposing ( MemoryTag(..)
                     , Mix
                     , instructionTransition
                     , CurrentInstruction
-                    , MemData
                     )
 
 import Dict
 import Instruction exposing (..)
 import Atom exposing (..)
+import Color exposing (..)
 
 type MemoryTag = Number
                | Instruction
@@ -68,22 +68,46 @@ type alias CurrentInstruction = Bool
 
 type alias MemData = ( Address
                      , Maybe String
-                     , Maybe Int
-                     , Maybe Tag
-                     , Maybe RelativeAddress
-                     , Maybe Index
+                     , MemoryTag
+                     , Int
+                     , Result DecodeError StaticInstructionClean
                      , CurrentInstruction
                      )
 
-{-
-memData : Mix
-        -> Address
-        -> MemData
+memData : Mix -> Address -> MemData
+memData m a =
+    ( a
+    , Dict.get a m.reverseSymbolTable
+    , readMeta a m.meta
+    , wordValue <| read a m.mem
+    , Result.map cleanStatic <| decodeInstruction <| unpack <| read a m.mem
+    , m.p == a
+    )
 
 totalMemData : Mix -> List MemData
 totalMemData m = List.map (memData m) <| Dict.keys m.mem
--}
 
+ppPrefix : Address -> Maybe String -> String
+ppPrefix a l =
+    case l of
+        Nothing -> (toString a) ++ " > "
+        Just x  -> (toString a) ++ " :" ++ x ++ " > "
+
+ppMemData : MemData -> (String,Color)
+ppMemData d =
+    let (a,l,t,v,i,b) = d
+        prefix = ppPrefix a l
+    in case t of
+           Number -> if b
+                     then (prefix ++ (toString v),darkGrey)
+                     else (prefix ++ (toString v),lightGrey)
+           Instruction
+               -> case i of
+                      Err err -> ppMemData (a,l,Number,v,i,b)
+                      Ok inst -> let (s,c1,c2) = ppStaticInstructionClean inst
+                                 in if b
+                                    then (prefix ++ s,c2)
+                                    else (prefix ++ s,c1)
 
 load : (MetaMemory,Memory,SymbolTable,ReverseSymbolTable) -> Mix
 load (metaMemory,memory,st,rst) =

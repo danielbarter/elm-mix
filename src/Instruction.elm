@@ -8,12 +8,15 @@ It is used to organize the machine state transition function
 module Instruction exposing ( Tag(..)
                             , RelativeAddress(..)
                             , StaticInstruction
+                            , StaticInstructionClean
                             , RelativeInstruction
                             , DynamicInstruction
                             , DecodeError
                             , decodeInstruction
                             , encodeInstruction
                             , ppTag
+                            , cleanStatic
+                            , ppStaticInstructionClean
                             )
 
 import Atom exposing (..)
@@ -26,6 +29,7 @@ type alias StaticInstructionClean = (Maybe Address, Maybe Index, Maybe Masks, Ta
 type alias StaticInstruction   = (Address,Index,Masks,Tag)
 type alias RelativeInstruction = (RelativeAddress,Index,Masks,Tag)
 type alias DynamicInstruction  = (Address,Masks,Tag)
+
 
 
 
@@ -801,3 +805,37 @@ cleanStatic (a,i,m,t) =
         MoveXI6              -> (Nothing,Nothing,Nothing,t)
         NoOperation          -> (Nothing,Nothing,Nothing,t)
         Halt                 -> (Nothing,Nothing,Nothing,t)
+
+
+
+
+
+ppMaybeAddress : Maybe Address -> String
+ppMaybeAddress a =
+    case a of
+        Nothing -> ""
+        Just x -> toString x
+
+ppMaybeIndex : Maybe Index -> String
+ppMaybeIndex i =
+    case i of
+        Nothing -> ""
+        Just x  -> "+" ++ toString x
+
+ppMaybeMasks : Maybe Masks -> String
+ppMaybeMasks m =
+    case m of
+        Nothing -> ""
+        Just x -> "/" ++ ((toString << value << masksToByte ) x)
+
+
+ppStaticInstructionClean : StaticInstructionClean -> (String,Color,Color)
+ppStaticInstructionClean (a,i,m,t) =
+    let (st,c1,c2) = ppTag t
+        sa = ppMaybeAddress a
+        si = ppMaybeIndex i
+        sm = ppMaybeMasks m
+    in ( String.join " " [sm,st,sa,si]
+       , c1
+       , c2
+       )
