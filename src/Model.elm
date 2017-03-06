@@ -79,19 +79,21 @@ update msg model =
 
 
 view : Model -> Html Msg
-view model = div [] [ documentation,
-    case model.mix of
-        [] -> div []
-              [ sourceCodeBox
-              , compileButton
-              , errorMessage model.compileError
-              ]
-        (m::ms) -> div []
-                   [ sourceCodeBox
-                   , runtimeButtons model.power
-                   , displayMix m
-                   , errorMessage model.runtimeError
-                   ]
+view model = div []
+             [ title
+             , case model.mix of
+                   [] -> div []
+                         [ sourceCodeBox
+                         , compileButton
+                         , errorMessage model.compileError
+                         ]
+                   (m::ms) -> div []
+                              [ sourceCodeBox
+                              , runtimeButtons model.power
+                              , displayMix m
+                              , errorMessage model.runtimeError
+                              ]
+             , documentation
              ]
 runtimeButtons : Power -> Html Msg
 runtimeButtons p =
@@ -224,15 +226,20 @@ displayMix mix =
     , displayMem mix
     ]
 
+title : Html Msg
+title = toHtml []
+        """
+# MIX 1010
+         """
+
 documentation : Html Msg
 documentation =
     toHtml []
         """
-# MIX 1010
 
-Below is a simulator for Knuth's MIX machine from the book [Art of Computer Programming](https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming). We use the identifier 1010 because this machine is slightly different from MIX 1009. We encode masks using binary and there is no division or multiplication instructions.
+This is a simulator for Knuth's MIX machine from the book [Art of Computer Programming](https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming). We use the identifier 1010 because this machine is slightly different from MIX 1009. We encode masks using binary and there is no division or multiplication instructions.
 
-Statements in the assembler language look like (:label) (/mask) (instruction) (relative address) (+index). Here is an example multiplication routine:
+Statements in the assembler language look like **(:label) (/mask) (instruction) (relative address) (+index)**. Here is an example multiplication routine:
 
 ```
 # multiplication routine
