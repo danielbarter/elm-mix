@@ -16,7 +16,6 @@ module Instruction exposing ( Tag(..)
                             , encodeInstruction
                             , ppTag
                             , cleanStatic
-                            , ppStaticInstructionClean
                             )
 
 import Atom exposing (..)
@@ -809,33 +808,3 @@ cleanStatic (a,i,m,t) =
 
 
 
-
-ppMaybeAddress : Maybe Address -> String
-ppMaybeAddress a =
-    case a of
-        Nothing -> ""
-        Just x -> toString x
-
-ppMaybeIndex : Maybe Index -> String
-ppMaybeIndex i =
-    case i of
-        Nothing -> ""
-        Just x  -> "+" ++ toString x
-
-ppMaybeMasks : Maybe Masks -> String
-ppMaybeMasks m =
-    case m of
-        Nothing -> ""
-        Just x -> "/" ++ ((toString << value << masksToByte ) x)
-
-
-ppStaticInstructionClean : StaticInstructionClean -> (String,Color,Color)
-ppStaticInstructionClean (a,i,m,t) =
-    let (st,c1,c2) = ppTag t
-        sa = ppMaybeAddress a
-        si = ppMaybeIndex i
-        sm = ppMaybeMasks m
-    in ( String.join " " [sm,st,sa,si]
-       , c1
-       , c2
-       )

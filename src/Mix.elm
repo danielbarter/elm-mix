@@ -87,24 +87,61 @@ memData m a =
 totalMemData : Mix -> List MemData
 totalMemData m = List.map (memData m) <| Dict.keys m.mem
 
+
+
+
+ppMaybeAddress : Mix -> Maybe Address -> String
+ppMaybeAddress mix a =
+    case a of
+        Nothing -> ""
+        Just x -> case Dict.get x mix.reverseSymbolTable of
+                      Nothing -> (toString x)
+                      Just l  -> l
+
+ppMaybeIndex : Maybe Index -> String
+ppMaybeIndex i =
+    case i of
+        Nothing -> ""
+        Just x  -> "+" ++ toString x
+
+ppMaybeMasks : Maybe Masks -> String
+ppMaybeMasks m =
+    case m of
+        Nothing -> ""
+        Just x -> "/" ++ ((toString << value << masksToByte ) x)
+
+
+ppStaticInstructionClean : Mix -> StaticInstructionClean -> (String,Color,Color)
+ppStaticInstructionClean mix (a,i,m,t) =
+    let (st,c1,c2) = ppTag t
+        sa = ppMaybeAddress mix a
+        si = ppMaybeIndex i
+        sm = ppMaybeMasks m
+    in ( String.join " " [sm,st,sa,si]
+       , c1
+       , c2
+       )
+
+
 ppPrefix : Address -> Maybe String -> String
 ppPrefix a l =
     case l of
         Nothing -> (toString a) ++ " > "
         Just x  -> (toString a) ++ " :" ++ x ++ " > "
 
-ppMemData : MemData -> (String,Color)
-ppMemData d =
+ppMemData : Mix -> MemData -> (String,Color)
+ppMemData mix d =
     let (a,l,t,v,i,b) = d
         prefix = ppPrefix a l
+        vv = ppMaybeAddress mix <| Just v
     in case t of
            Number -> if b
-                     then (prefix ++ (toString v),darkGrey)
-                     else (prefix ++ (toString v),lightGrey)
+                     then (prefix ++ vv,darkGrey)
+                     else (prefix ++ vv,lightGrey)
            Instruction
                -> case i of
-                      Err err -> ppMemData (a,l,Number,v,i,b)
-                      Ok inst -> let (s,c1,c2) = ppStaticInstructionClean inst
+                      Err err -> ppMemData mix (a,l,Number,v,i,b)
+                      Ok inst -> let (s,c1,c2) = ppStaticInstructionClean mix inst
                                  in if b
                                     then (prefix ++ s,c2)
                                     else (prefix ++ s,c1)
