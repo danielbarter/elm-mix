@@ -42,6 +42,7 @@ type Token = InstructionTag Tag
            | LabelTag String
            | MaskTag Int
            | IndexTag Int
+           | Comment String
 
 
 getToken = List.foldl try getInstruction
@@ -49,6 +50,7 @@ getToken = List.foldl try getInstruction
            , getLabel
            , getMask
            , getIndex
+           , getComment
            ]
 
 getRelValue = ((RelativeTag << Value) << (Result.withDefault 0) << String.toInt)
@@ -72,6 +74,9 @@ getIndex = ( IndexTag
                 << String.toInt
                 << (String.dropLeft 1) )
           <$> (getLexeme <| Regex.regex "[+][0-9]+")
+
+getComment = (Comment << (String.dropLeft 1))
+             <$> (getLexeme <| Regex.regex "#(.)*")
 
 f t r = (return <| InstructionTag <| t) <* (getLexeme <| Regex.regex r)
 
@@ -252,8 +257,14 @@ distrubuteError l =
                        Ok t -> Result.map ((::) t) <| distrubuteError xs
 
 
+commentLine : List Token -> Bool
+commentLine l =
+    case l of
+        (Comment s)::ts -> False
+        _ -> True
+
 tokenize : String -> List (List Token)
-tokenize s = filterNothing
+tokenize s = List.filter commentLine <| filterNothing
                   <| List.map (tagEmptyLine << tokenizeLine)
                   <| String.lines s
 

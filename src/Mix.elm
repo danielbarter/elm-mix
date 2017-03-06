@@ -998,4 +998,4 @@ instructionTransition (adr,masks,i) s =
         NoOperation
             -> s
         Halt
-            -> { s | p = s.p - 1 }
+            -> s

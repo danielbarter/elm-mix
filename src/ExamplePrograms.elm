@@ -20,6 +20,8 @@ ex1 =
      JMP start
      :end LDA s
      HLT
+
+     # data
      :s 0
      :x 5
      :y 6           
