@@ -144,7 +144,7 @@ boxStyle cb ct =
            , ("display","inline-block")
            , ("padding","10px")
            , ("border-radius","10px")
-           , ("border-size","2px")
+           , ("border-size","3px")
            , ("border-style","solid")
            , ("border-color","white")
            ]
