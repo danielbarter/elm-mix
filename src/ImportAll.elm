@@ -14,5 +14,6 @@ import Compiler exposing (..)
 import ExamplePrograms exposing (..)
 import Model exposing (..)
 import Main exposing (..)
+import MemData exposing (..)
 
 x = 42

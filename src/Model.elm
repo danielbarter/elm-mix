@@ -9,6 +9,8 @@ import Color exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick,onInput)
+import MemData exposing (..)
+
 
 type alias Model = { sourceCode : String
                    , compileError : Maybe CompilerError
