@@ -111,7 +111,7 @@ ppValue : Mix -> Int -> String
 ppValue mix v =
     case Dict.get v mix.reverseSymbolTable of
         Nothing -> (toString v)
-        Just l ->  (toString v) ++ ":" ++ l
+        Just l ->  (toString v) ++ "|" ++ l
 
 ppMemData : Mix -> MemData -> (String,Color,Color)
 ppMemData mix d =
