@@ -150,12 +150,44 @@ boxStyle cb ct =
            ]
     ]
 
+outerBoxStyle : List (Attribute Msg)
+outerBoxStyle =
+    [ style [ ("display","inline-block")
+            , ("border-size","3px")
+            , ("border-style","solid")
+            , ("border-color","white")
+            ]
+    ]
+
+leftBoxStyle : Color -> Color -> List (Attribute Msg)
+leftBoxStyle cb ct =
+    [style [ ("background-color",printColor cb)
+           , ("color",printColor ct)
+           , ("display","inline-block")
+           , ("padding","10px")
+           , ("border-radius","10px 0px 0px 10px")
+           ]
+    ]
+
+
+rightBoxStyle : Color -> Color -> List (Attribute Msg)
+rightBoxStyle cb ct =
+    [style [ ("background-color",printColor cb)
+           , ("color",printColor ct)
+           , ("display","inline-block")
+           , ("padding","10px")
+           , ("border-radius","0px 10px 10px 0px")
+           ]
+    ]
+
 displayMemData : Mix -> MemData -> Html Msg
 displayMemData mix d =
-    let (s,cb,ct) = ppMemData mix d
+    let (p,mb,mt,s,cb,ct) = ppMemData mix d
     in div
-        (boxStyle cb ct)
-        [text s]
+        outerBoxStyle
+        [ div (leftBoxStyle mb mt) [text p]
+        , div (rightBoxStyle cb ct) [text s]
+        ]
 
 displayWord : Word -> Html Msg
 displayWord w =

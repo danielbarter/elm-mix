@@ -44,10 +44,10 @@ ppWord : Word -> (String,Color,Color)
 ppWord w = (toString <| wordValue w,lightCharcoal,black)
 
 ppSmallWord : SmallWord -> (String,Color,Color)
-ppSmallWord w = (toString <| smallWordValue w,darkCharcoal,white)
+ppSmallWord w = (toString <| smallWordValue w,darkBlue,white)
 
 ppJump : SmallWord -> (String,Color,Color)
-ppJump w = (toString <| smallWordValue w,darkBlue,white)
+ppJump w = (toString <| smallWordValue w,darkCharcoal,white)
 
 ppOverflow : OverflowToggle -> (String,Color,Color)
 ppOverflow t =
@@ -71,7 +71,7 @@ ppMaybeAddress mix a =
         Nothing -> ""
         Just x -> case Dict.get x mix.reverseSymbolTable of
                       Nothing -> (toString x)
-                      Just l  -> (toString x) ++ "|" ++ l
+                      Just l  -> (toString x) ++ ":" ++ l
 
 ppMaybeIndex : Maybe Index -> String
 ppMaybeIndex i =
@@ -111,24 +111,25 @@ ppValue : Mix -> Int -> String
 ppValue mix v =
     case Dict.get v mix.reverseSymbolTable of
         Nothing -> (toString v)
-        Just l ->  (toString v) ++ "|" ++ l
+        Just l ->  (toString v) ++ ":" ++ l
 
-ppMemData : Mix -> MemData -> (String,Color,Color)
+ppMemData : Mix -> MemData -> (String,Color,Color,String,Color,Color)
 ppMemData mix d =
     let (a,l,t,v,i,b) = d
-        prefix = ppPrefix a l
+        p = ppPrefix a l
         vv = ppValue mix v
     in case t of
            Number -> if b
-                     then (prefix ++ vv,darkOrange,white)
-                     else (prefix ++ vv,lightCharcoal,black)
+                     then (p,darkCharcoal,white,vv,darkOrange,white)
+                     else (p,darkCharcoal,white,vv,lightCharcoal,black)
            Instruction
                -> case i of
                       Err err -> ppMemData mix (a,l,Number,v,i,b)
-                      Ok inst -> let s = ppStaticInstructionClean mix inst
-                                 in if b
-                                    then (prefix ++ s,darkOrange,white)
-                                    else (prefix ++ s,lightCharcoal,black)
+                      Ok inst
+                          -> let s = ppStaticInstructionClean mix inst
+                             in if b
+                                then (p,darkCharcoal,white,s,darkOrange,white)
+                                else (p,darkCharcoal,white,s,lightCharcoal,black)
 
 
 
