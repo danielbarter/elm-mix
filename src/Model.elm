@@ -152,7 +152,7 @@ boxStyle cb ct =
 
 displayMemData : Mix -> MemData -> Html Msg
 displayMemData mix d =
-    let (s,cb,ct) = ppLightMemData mix d
+    let (s,cb,ct) = ppMemData mix d
     in div
         (boxStyle cb ct)
         [text s]
