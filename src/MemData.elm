@@ -71,7 +71,7 @@ ppMaybeAddress mix a =
         Nothing -> ""
         Just x -> case Dict.get x mix.reverseSymbolTable of
                       Nothing -> (toString x)
-                      Just l  -> l
+                      Just l  -> (toString x) ++ ":" ++ l
 
 ppMaybeIndex : Maybe Index -> String
 ppMaybeIndex i =
