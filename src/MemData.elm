@@ -102,10 +102,10 @@ ppStaticInstructionClean mix (a,i,m,t) =
 
 ppPrefix : Address -> Maybe String -> String
 ppPrefix a l =
-    let pref = (toString a) ++ ":"
+    let pref = (toString a)
     in case l of
            Nothing -> pref ++ " "
-           Just x  -> pref ++ x ++ " "
+           Just x  -> pref ++ ":" ++ x ++ " "
 
 ppValue : Mix -> Int -> String
 ppValue mix v =
