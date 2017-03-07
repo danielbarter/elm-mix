@@ -2,6 +2,7 @@ module MemData exposing ( CurrentInstruction
                         , MemData
                         , totalMemData
                         , ppMemData
+                        , ppLightMemData
                         , ppWord
                         , ppJump
                         , ppSmallWord
@@ -63,14 +64,13 @@ ppComparision t =
         E -> ("=",darkGrey,white)
         G -> (">",darkGreen,white)
 
-ppMaybeAddress : Mix -> Maybe Address -> String
-ppMaybeAddress mix a =
+
+
+ppMaybeAddress : Maybe Address -> String
+ppMaybeAddress a =
     case a of
         Nothing -> ""
-        Just x -> case Dict.get x mix.reverseSymbolTable of
-                      Nothing -> (toString x)
-                      Just l  -> l
-
+        Just x -> (toString x)
 
 ppMaybeIndex : Maybe Index -> String
 ppMaybeIndex i =
@@ -88,7 +88,7 @@ ppMaybeMasks m =
 ppStaticInstructionClean : Mix -> StaticInstructionClean -> String
 ppStaticInstructionClean mix (a,i,m,t) =
     let st = ppTag t
-        sa = ppMaybeAddress mix a
+        sa = ppMaybeAddress a
         si = ppMaybeIndex i
         sm = ppMaybeMasks m
     in  String.join " " [sm,st,sa,si]
@@ -105,7 +105,7 @@ ppMemData : Mix -> MemData -> (String,Color,Color)
 ppMemData mix d =
     let (a,l,t,v,i,b) = d
         prefix = ppPrefix a l
-        vv = ppMaybeAddress mix <| Just v
+        vv = (toString v)
     in case t of
            Number -> if b
                      then (prefix ++ vv,darkOrange,white)
@@ -119,3 +119,40 @@ ppMemData mix d =
                                     else (prefix ++ s,lightCharcoal,black)
 
 
+ppLightMaybeAddress : Mix -> Maybe Address -> String
+ppLightMaybeAddress mix a =
+    case a of
+        Nothing -> ""
+        Just x -> case Dict.get x mix.reverseSymbolTable of
+                      Nothing -> (toString x)
+                      Just l  -> l
+
+ppLightStaticInstructionClean : Mix -> StaticInstructionClean -> String
+ppLightStaticInstructionClean mix (a,i,m,t) =
+    let st = ppTag t
+        sa = ppLightMaybeAddress mix a
+    in String.join " " [st,sa]
+
+ppLightPrefix : Address -> Maybe String -> String
+ppLightPrefix a l =
+    case l of
+        Nothing -> ""
+        Just x -> ":" ++ x ++ " "
+
+
+ppLightMemData : Mix -> MemData -> (String,Color,Color)
+ppLightMemData mix d =
+    let (a,l,t,v,i,b) = d
+        prefix = ppLightPrefix a l
+        vv = ppLightMaybeAddress mix <| Just v
+    in case t of
+           Number -> if b
+                     then (prefix ++ vv,darkOrange,white)
+                     else (prefix ++ vv,lightCharcoal,black)
+           Instruction
+               -> case i of
+                      Err err -> ppLightMemData mix (a,l,Number,v,i,b)
+                      Ok inst -> let s = ppLightStaticInstructionClean mix inst
+                                 in if b
+                                    then (prefix ++ s,darkOrange,white)
+                                    else (prefix ++ s,lightCharcoal,black)
