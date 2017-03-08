@@ -65,13 +65,11 @@ ppComparision t =
 
 
 
-ppMaybeAddress : Mix -> Maybe Address -> String
-ppMaybeAddress mix a =
+ppMaybeAddress : Maybe Address -> String
+ppMaybeAddress a =
     case a of
         Nothing -> ""
-        Just x -> case Dict.get x mix.reverseSymbolTable of
-                      Nothing -> (toString x)
-                      Just l  -> (toString x) ++ ":" ++ l
+        Just x -> toString x
 
 ppMaybeIndex : Maybe Index -> String
 ppMaybeIndex i =
@@ -93,7 +91,7 @@ ppMaybeMasks m =
 ppStaticInstructionClean : Mix -> StaticInstructionClean -> String
 ppStaticInstructionClean mix (a,i,m,t) =
     let st = ppTag t
-        sa = ppMaybeAddress mix a
+        sa = ppMaybeAddress a
         si = ppMaybeIndex i
         sm = ppMaybeMasks m
     in  String.join " " [sm,st,sa,si]
@@ -107,17 +105,14 @@ ppPrefix a l =
            Nothing -> pref ++ " "
            Just x  -> pref ++ ":" ++ x ++ " "
 
-ppValue : Mix -> Int -> String
-ppValue mix v =
-    case Dict.get v mix.reverseSymbolTable of
-        Nothing -> (toString v)
-        Just l ->  (toString v) ++ ":" ++ l
+ppValue : Int -> String
+ppValue v = toString v
 
 ppMemData : Mix -> MemData -> (String,Color,Color,String,Color,Color)
 ppMemData mix d =
     let (a,l,t,v,i,b) = d
         p = ppPrefix a l
-        vv = ppValue mix v
+        vv = ppValue v
     in case t of
            Number -> if b
                      then (p,darkCharcoal,white,vv,darkOrange,white)
