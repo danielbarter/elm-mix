@@ -85,6 +85,7 @@ view model = div []
                    [] -> div []
                          [ sourceCodeBox
                          , compileButton
+                         , displayDefaultRegisters
                          , errorMessage model.compileError
                          ]
                    (m::ms) -> div []
@@ -120,7 +121,7 @@ errorMessage : Maybe a -> Html Msg
 errorMessage e =
     case e of
         Nothing -> text ""
-        Just err -> text <| toString err
+        Just err -> div (boxStyle darkRed white) [text <| toString err]
 
 
 
@@ -196,6 +197,26 @@ displayWord w =
         (boxStyle cb ct)
         [text s]
 
+displayDefaultWord : String -> Html Msg
+displayDefaultWord s =
+    let (_,cb,ct) = ppWord zeroWord
+    in div
+        (boxStyle cb ct)
+        [text s]
+
+displayDefaultSmallWord : String -> Html Msg
+displayDefaultSmallWord s =
+    let (_,cb,ct) = ppSmallWord zeroSmallWord
+    in div
+        (boxStyle cb ct)
+        [text s]
+
+displayDefaultJump : String -> Html Msg
+displayDefaultJump s =
+    let (_,cb,ct) = ppJump zeroSmallWord
+    in div
+        (boxStyle cb ct)
+        [text s]
 
 displaySmallWord : SmallWord -> Html Msg
 displaySmallWord w =
@@ -225,6 +246,19 @@ displayComparison t =
         (boxStyle cb ct)
         [text s]
 
+displayDefaultOverflow : String -> Html Msg
+displayDefaultOverflow s =
+    let (_,cb,ct) = ppOverflow Good
+    in div
+        (boxStyle cb ct)
+        [text s]
+
+displayDefaultComparison : String -> Html Msg
+displayDefaultComparison s =
+    let (_,cb,ct) = ppComparision E
+    in div
+        (boxStyle cb ct)
+        [text s]
 
 displayMem : Mix -> Html Msg
 displayMem mix =
@@ -249,6 +283,24 @@ displayRegisters mix =
     , displayOverflow mix.overflow
     , displayComparison mix.comparison
     ]
+
+displayDefaultRegisters : Html Msg
+displayDefaultRegisters =
+    div
+    []
+    [ displayDefaultWord "A"
+    , displayDefaultWord "X"
+    , displayDefaultSmallWord "I1"
+    , displayDefaultSmallWord "I2"
+    , displayDefaultSmallWord "I3"
+    , displayDefaultSmallWord "I4"
+    , displayDefaultSmallWord "I5"
+    , displayDefaultSmallWord "I6"
+    , displayDefaultJump "J"
+    , displayDefaultOverflow "Overflow"
+    , displayDefaultComparison "Comparison"
+    ]
+
 
 displayMix : Mix -> Html Msg
 displayMix mix =
