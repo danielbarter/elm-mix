@@ -148,6 +148,8 @@ boxStyle cb ct =
            , ("border-size","3px")
            , ("border-style","solid")
            , ("border-color","white")
+           , ("font-family","monospace")
+           , ("font-size","20px")
            ]
     ]
 
@@ -157,6 +159,8 @@ outerBoxStyle =
             , ("border-size","3px")
             , ("border-style","solid")
             , ("border-color","white")
+            , ("font-family","monospace")
+            , ("font-size","20px")
             ]
     ]
 
@@ -167,6 +171,8 @@ leftBoxStyle cb ct =
            , ("display","inline-block")
            , ("padding","10px")
            , ("border-radius","10px 0px 0px 10px")
+           , ("font-family","monospace")
+           , ("font-size","20px")
            ]
     ]
 
@@ -178,6 +184,8 @@ rightBoxStyle cb ct =
            , ("display","inline-block")
            , ("padding","10px")
            , ("border-radius","0px 10px 10px 0px")
+           , ("font-family","monospace")
+           , ("font-size","20px")
            ]
     ]
 
