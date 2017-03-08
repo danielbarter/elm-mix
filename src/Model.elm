@@ -100,22 +100,24 @@ runtimeButtons : Power -> Html Msg
 runtimeButtons p =
     case p of
         On -> div []
-               [ button [onClick StepForward] [text "step"]
-               , button [onClick StepBackward] [text "back"]
-               , button [onClick KillCurrentCore] [text "kill core"]
+               [ button ([onClick StepForward] ++ bStyle) [text "step"]
+               , button ([onClick StepBackward] ++ bStyle) [text "back"]
+               , button ([onClick KillCurrentCore] ++ bStyle) [text "kill core"]
                ]
         Off -> div []
-                [ button [onClick StepBackward] [text "back"]
-                , button [onClick KillCurrentCore] [text "kill core"]
+                [ button ([onClick StepBackward] ++ bStyle) [text "back"]
+                , button ([onClick KillCurrentCore] ++ bStyle) [text "kill core"]
                 ]
 compileButton : Html Msg
 compileButton = div []
-                [button [onClick Compile] [text "compile"]]
+                [button ([onClick Compile] ++ bStyle) [text "compile"]]
 
 sourceCodeBox : Html Msg
 sourceCodeBox =
     div []
-    [ textarea [placeholder "Write source code here.", onInput ReadCode] []]
+    [ textarea ([placeholder "Write source code here."
+                , onInput ReadCode
+                ] ++ bStyle )  []]
 
 errorMessage : Maybe a -> Html Msg
 errorMessage e =
@@ -137,6 +139,10 @@ printColor c =
         a = toString <| .alpha cc
     in "rgba(" ++ (String.join "," [r,g,b,a]) ++ ")"
 
+bStyle = [ style [ ("font-family","monospace")
+                 , ("font-size","15px")
+                 ]
+         ]
 
 boxStyle : Color -> Color -> List (Attribute Msg)
 boxStyle cb ct =
