@@ -72,5 +72,7 @@ The MIX 1010 has a lot of instructions:
 - `SAX`. Shift `X` cyclically by value.
 - `SWAP`. Swap the `X` and `A` registers.
 - `MOVXi`. Move the value in `X` to `Ii`.
+- `MOViX`. Move the value in `Ii` to `X`.
+- `MOVJX`. Move the value in `J` to `X`.
 - `NOP`. No instruction.
 - `HLT`. Halt.
