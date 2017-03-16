@@ -220,10 +220,17 @@ getInstruction = List.foldl try (f  Halt "HLT")
                  , f  MoveXI4             "MOVX4"
                  , f  MoveXI5             "MOVX5"
                  , f  MoveXI6             "MOVX6"
+                 , f  MoveI1X             "MOV1X"
+                 , f  MoveI2X             "MOV2X"
+                 , f  MoveI3X             "MOV3X"
+                 , f  MoveI4X             "MOV4X"
+                 , f  MoveI5X             "MOV5X"
+                 , f  MoveI6X             "MOV6X"
+                 , f  MoveJX              "MOVJX"
                  , f  NoOperation         "NOP"
                  ]
 
- 
+
 
 tokenizeLine : String -> List Token
 tokenizeLine s = case getToken s of

@@ -884,6 +884,20 @@ instructionTransition (adr,masks,i) s =
             -> { s | i5 = wordContract s.x }
         MoveXI6
             -> { s | i6 = wordContract s.x }
+        MoveI1X
+            -> { s | x = wordExpand s.i1 }
+        MoveI2X
+            -> { s | x = wordExpand s.i2 }
+        MoveI3X
+            -> { s | x = wordExpand s.i3 }
+        MoveI4X
+            -> { s | x = wordExpand s.i4 }
+        MoveI5X
+            -> { s | x = wordExpand s.i5 }
+        MoveI6X
+            -> { s | x = wordExpand s.i6 }
+        MoveJX
+            -> { s | x = wordExpand s.j }
         NoOperation
             -> s
         Halt

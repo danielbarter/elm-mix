@@ -170,6 +170,13 @@ type Tag = LoadA                 -- LDA
          | MoveXI4               -- MOVX4
          | MoveXI5               -- MOVX5
          | MoveXI6               -- MOVX6
+         | MoveI1X               -- MOV1X
+         | MoveI2X               -- MOV2X
+         | MoveI3X               -- MOV3X
+         | MoveI4X               -- MOV4X
+         | MoveI5X               -- MOV5X
+         | MoveI6X               -- MOV6X
+         | MoveJX                -- MOVJX
          | NoOperation           -- NOP
          | Halt                  -- HLT
 
@@ -316,6 +323,13 @@ ppTag t =
        MoveXI4              -> "MOVX4"
        MoveXI5              -> "MOVX5"
        MoveXI6              -> "MOVX6"
+       MoveI1X              -> "MOV1X"
+       MoveI2X              -> "MOV2X"
+       MoveI3X              -> "MOV3X"
+       MoveI4X              -> "MOV4X"
+       MoveI5X              -> "MOV5X"
+       MoveI6X              -> "MOV6X"
+       MoveJX               -> "MOVJX"
        NoOperation          -> "NOP"
        Halt                 -> "HLT"
 
@@ -499,13 +513,20 @@ decodeInstruction (a,i,f,c) =
                   4 -> Ok (a,i,ms,SwapAX)
                   y -> Err <| InvalidModification f
         7  -> case f of
-                  0 -> Ok (a,i,ms,MoveXI1)
-                  1 -> Ok (a,i,ms,MoveXI2)
-                  2 -> Ok (a,i,ms,MoveXI3)
-                  3 -> Ok (a,i,ms,MoveXI4)
-                  4 -> Ok (a,i,ms,MoveXI5)
-                  5 -> Ok (a,i,ms,MoveXI6)
-                  y -> Err <| InvalidModification f
+                  0  -> Ok (a,i,ms,MoveXI1)
+                  1  -> Ok (a,i,ms,MoveXI2)
+                  2  -> Ok (a,i,ms,MoveXI3)
+                  3  -> Ok (a,i,ms,MoveXI4)
+                  4  -> Ok (a,i,ms,MoveXI5)
+                  5  -> Ok (a,i,ms,MoveXI6)
+                  6  -> Ok (a,i,ms,MoveI1X)
+                  7  -> Ok (a,i,ms,MoveI2X)
+                  8  -> Ok (a,i,ms,MoveI3X)
+                  9  -> Ok (a,i,ms,MoveI4X)
+                  10 -> Ok (a,i,ms,MoveI5X)
+                  11 -> Ok (a,i,ms,MoveI6X)
+                  12 -> Ok (a,i,ms,MoveJX)
+                  y  -> Err <| InvalidModification f
         5  -> case f of
                   2 -> Ok (a,i,ms,Halt)
                   y -> Err <| InvalidModification f
@@ -655,6 +676,13 @@ encodeInstruction (a,i,ms,inst) =
        MoveXI4              -> (0,0,3,7)
        MoveXI5              -> (0,0,4,7)
        MoveXI6              -> (0,0,5,7)
+       MoveI1X              -> (0,0,6,7)
+       MoveI2X              -> (0,0,7,7)
+       MoveI3X              -> (0,0,8,7)
+       MoveI4X              -> (0,0,9,7)
+       MoveI5X              -> (0,0,10,7)
+       MoveI6X              -> (0,0,11,7)
+       MoveJX               -> (0,0,12,7)
        NoOperation          -> (0,0,0,0)
        Halt                 -> (0,0,2,5)
 
@@ -801,5 +829,12 @@ cleanStatic (a,i,m,t) =
         MoveXI4              -> (Nothing,Nothing,Nothing,t)
         MoveXI5              -> (Nothing,Nothing,Nothing,t)
         MoveXI6              -> (Nothing,Nothing,Nothing,t)
+        MoveI1X              -> (Nothing,Nothing,Nothing,t)
+        MoveI2X              -> (Nothing,Nothing,Nothing,t)
+        MoveI3X              -> (Nothing,Nothing,Nothing,t)
+        MoveI4X              -> (Nothing,Nothing,Nothing,t)
+        MoveI5X              -> (Nothing,Nothing,Nothing,t)
+        MoveI6X              -> (Nothing,Nothing,Nothing,t)
+        MoveJX               -> (Nothing,Nothing,Nothing,t)
         NoOperation          -> (Nothing,Nothing,Nothing,t)
         Halt                 -> (Nothing,Nothing,Nothing,t)
