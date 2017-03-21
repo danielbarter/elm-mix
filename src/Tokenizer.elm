@@ -9,10 +9,9 @@ the tokenizer converts a string into a list of tokens for parsing.
 module Tokenizer exposing ( tokenize
                           , Token(..)
                           , filterNothing
-                          , distrubuteError
                           )
 
-
+import Atom exposing (..)
 import StateMonad exposing (..)
 import Instruction exposing (..)
 import Regex
@@ -43,6 +42,9 @@ type Token = InstructionTag Tag
            | MaskTag Int
            | IndexTag Int
            | Comment String
+           | SchemaTag Schema
+           | LeftBracket
+           | RightBracket
 
 
 getToken = List.foldl try getInstruction
@@ -51,7 +53,28 @@ getToken = List.foldl try getInstruction
            , getMask
            , getIndex
            , getComment
+           , getBBBBB
+           , getWBBB
+           , getBWBB
+           , getBBWB
+           , getBBBW
+           , getWWB
+           , getWBW
+           , getBWW
+           , getLeftBracket
+           , getRightBracket
            ]
+
+getBBBBB = g BBBBB "BBBBB"
+getWBBB  = g WBBB  "WBBB"
+getBWBB  = g BWBB  "BWBB"
+getBBWB  = g BBWB  "BBWB"
+getBBBW  = g BBBW  "BBBW"
+getWWB   = g WWB   "WWB"
+getWBW   = g WBW   "WBW"
+getBWW   = g BWW   "BWW"
+
+g t r = (return <| SchemaTag <| t) <* (getLexeme <| Regex.regex r)
 
 getRelValue = ((RelativeTag << Value) << (Result.withDefault 0) << String.toInt)
               <$> (getLexeme <| Regex.regex "-?[0-9]+")
@@ -59,6 +82,8 @@ getRelLabel = (RelativeTag << Label)
               <$> (getLexeme <| Regex.regex "[a-z]([a-z]|_)*")
 getRelative = try getRelValue getRelLabel
 
+getLeftBracket  = (return LeftBracket)  <* (getLexeme <| Regex.regex "\\[")
+getRightBracket = (return RightBracket) <* (getLexeme <| Regex.regex "\\]")
 
 getLabel =  (LabelTag << (String.dropLeft 1) )
             <$> (getLexeme <| Regex.regex "[:][a-z]([a-z]|_)*")
@@ -254,14 +279,6 @@ filterNothing l =
                        Just z -> z :: (filterNothing xs)
                        Nothing -> filterNothing xs
 
-
-distrubuteError : List (Result e a) -> Result e (List a)
-distrubuteError l =
-    case l of
-        [] -> Ok []
-        (x::xs) -> case x of
-                       Err err -> Err err
-                       Ok t -> Result.map ((::) t) <| distrubuteError xs
 
 
 commentLine : List Token -> Bool

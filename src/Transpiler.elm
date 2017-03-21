@@ -61,8 +61,11 @@ evaluateLabelInst s (r,i,m,t) =
 
 intermediateToASM : SymbolTable -> Intermediate -> Result TranspileError ASM
 intermediateToASM s i =
-   distrubuteCodeError
-   <| mapCode Tuple.second (evaluateLabel s) (evaluateLabelInst s) i
+   Result.map (mapCode identity resolveDataValue identity)
+   <| distrubuteCodeError
+   <| mapCode Tuple.second
+       (distrubuteDataValueError << (mapDataValue <| evaluateLabel s))
+       (evaluateLabelInst s) i
 
 transpile : List REL -> Result TranspileError (List ASM,SymbolTable)
 transpile l =

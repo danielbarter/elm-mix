@@ -47,7 +47,20 @@ module Atom exposing ( Base
                      , UnpackedWord
                      , unpack
                      , pack
+                     , Schema(..)
+                     , schemaPack
+                     , distrubuteError
                      )
+
+distrubuteError : List (Result e a) -> Result e (List a)
+distrubuteError l =
+    case l of
+        [] -> Ok []
+        (x::xs) -> case x of
+                       Err err -> Err err
+                       Ok t -> Result.map ((::) t) <| distrubuteError xs
+
+
 
 type alias Base = Int
 type Sign = Pos | Neg
@@ -304,6 +317,49 @@ type alias Address = Int
 type alias Index = Int
 type alias UnpackedWord = (Address,Index,Modification,InstructionCode)
 
+
+type Schema = BBBBB
+            | WBBB
+            | BWBB
+            | BBWB
+            | BBBW
+            | WWB
+            | WBW
+            | BWW
+
+getWithIndex : Int -> (List a) -> Maybe a
+getWithIndex n l = List.head <| List.drop n l
+
+-- this is pretty inefficient, but it only happens at compile time so whatever
+schemaPackWord : Schema -> (List Int) -> Word
+schemaPackWord s l =
+    let l0 = Maybe.withDefault 0 <| getWithIndex 0 l
+        l1 = Maybe.withDefault 0 <| getWithIndex 1 l
+        l2 = Maybe.withDefault 0 <| getWithIndex 2 l
+        l3 = Maybe.withDefault 0 <| getWithIndex 3 l
+        l4 = Maybe.withDefault 0 <| getWithIndex 4 l
+        ll0 = byte l0
+        ll1 = byte l1
+        ll2 = byte l2
+        ll3 = byte l3
+        ll4 = byte l4
+        (_,(s0,b0,bb0)) = intToSmallWord l0 zeroSmallWord
+        (_,(s1,b1,bb1)) = intToSmallWord l1 zeroSmallWord
+        (_,(s2,b2,bb2)) = intToSmallWord l2 zeroSmallWord
+        (_,(s3,b3,bb3)) = intToSmallWord l3 zeroSmallWord
+        (_,(s4,b4,bb4)) = intToSmallWord l4 zeroSmallWord
+    in case s of
+           BBBBB -> (Pos,ll0,ll1,ll2,ll3,ll4)
+           WBBB  -> (s0,b0,bb0,ll1,ll2,ll3)
+           BWBB  -> (Pos,ll0,b1,bb1,ll2,ll3)
+           BBWB  -> (Pos,ll0,ll1,b2,bb2,ll3)
+           BBBW  -> (Pos,ll0,ll1,ll2,b3,bb3)
+           WWB   -> (s0,b0,bb0,b1,bb1,ll2)
+           WBW   -> (s0,b0,bb0,ll1,b2,bb2)
+           BWW   -> (Pos,ll0,b1,bb1,b2,bb2)
+
+schemaPack : Schema -> (List Int) -> Int
+schemaPack s l = wordValue <| schemaPackWord s l
 
 unpack : Word -> UnpackedWord
 unpack (s,b1,b2,b3,b4,b5) = ( smallWordValue (s,b1,b2)

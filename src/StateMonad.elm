@@ -15,9 +15,11 @@ module StateMonad exposing   ( State
                              , (<*>)
                              , (<$>)
                              , map2
+                             , map3
                              , map5
                              , (<*)
                              , (*>)
+                             , repeat
                              )
 
 
@@ -68,6 +70,12 @@ throwError err = let p s = Err err
 (<$>) : ( a -> b ) -> State s e a -> State s e b
 (<$>) f p = (return f) <*> p
 
+repeat : State s e a -> State s e (List a)
+repeat p =
+    let q s = case p s of
+                  Ok (ss,x) -> (Result.map << Tuple.mapSecond) ((::) x) <| q ss
+                  Err err   -> Ok (s,[])
+    in q
 
 map2 : ( a -> b -> c) -> State s e a -> State s e b -> State s e c
 map2 f p q = ( f <$> p ) <*> q
