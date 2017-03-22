@@ -34,6 +34,8 @@ type alias State s e a = s -> Result e (s,a)
                           Ok (ss,x) -> f x ss
             in q
 
+
+-- if the first op fails, then the state is rolled back
 try : State s e a -> State s e a -> State s e a
 try p q =
     let r s = case p s of
