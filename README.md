@@ -31,6 +31,13 @@ Some instructions use the modification byte for masking. This works as follows: 
 ```
 The first instruction will load 9999009900 into register `A`. This is because 5 = 000101, so we mask of the bytes 3 and 5.
 
+### Packing Schemas
+
+Sometimes, you want to store a specific byte pattern at some location in memory. You can do this using the following syntax:
+```
+(:label) schema [RelativeAddress RelativeAddress ...]
+```
+The valid Schemas are `BBBBB,WBBB,BWBB,BBWB,BBBW,WWB,WBW,BWW`. For example, `WBW [211 3 4]` will store the word `021130003` in memory.
 ### Assembly 
 
 The assembly language used by the machine is slightly different from the MIX 1009. Statements are of the form
