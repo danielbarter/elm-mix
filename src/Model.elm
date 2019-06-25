@@ -153,7 +153,7 @@ boxStyle cb ct =
            , ("border-radius","10px")
            , ("border-size","3px")
            , ("border-style","solid")
-           , ("border-color","white")
+           , ("border-color","rgb(215,215,215)")
            , ("font-family","monospace")
            , ("font-size","20px")
            ]
@@ -164,7 +164,7 @@ outerBoxStyle =
     [ style [ ("display","inline-block")
             , ("border-size","3px")
             , ("border-style","solid")
-            , ("border-color","white")
+            , ("border-color","rgb(215,215,215)")
             , ("font-family","monospace")
             , ("font-size","20px")
             ]
